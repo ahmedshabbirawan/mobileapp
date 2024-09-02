@@ -1,3 +1,4 @@
 /vendor
 .htaccess
-.server
+.server.php
+.env
