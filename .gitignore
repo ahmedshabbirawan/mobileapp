@@ -2,3 +2,6 @@
 .htaccess
 .server.php
 .env
+composer.lock
+composer.phar
+/public/.htaccess
