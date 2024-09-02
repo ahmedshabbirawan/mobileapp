@@ -101,8 +101,8 @@
                 <div class="footer-inner">
                     <div class="footer-content">
                         <span class="bigger-120">
-                            <span class="blue bolder">TechBite</span>
-                            Point of Sale &copy; 2021-<?php echo date('Y');?>
+                            <span class="blue bolder">{{ config('app.name') }}</span>
+                             &copy; 2021-<?php echo date('Y');?>
                         </span>
                     </div>
                 </div>
