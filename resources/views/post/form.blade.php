@@ -2,68 +2,46 @@
 
 
 <?php
-$categoryID         = '';
 $subCategoryID      = '';
-$productCategoryID  = '';
 $name = '';
 $productID = '';
-$uomID = '';
-$qty = '';
-
-// print_r($attributeIDs); exit;
-
-$attributeStr = '';
 
 $actionURL =  route('post.logo.store');
-
 $sub_category = [];
 
-// echo $attributeStr; exit;
-
 if (isset($product)) {
-    $categoryID         = '';//$categories['category']['id'];
-    $subCategoryID      = []; //$categories['sub_category']['id'];
-    $productCategoryID  = ''; //$categories['product_category']['id'];
+    $subCategoryID = [];
     $name = $product->post_title;
-    $actionURL =  route('post.logo.update', $product->id);
+    $actionURL = route('post.logo.update', $product->id);
     $productID = $product->id;
-
-   
-
 }
 ?>
 
-<?php
-
-?>
 
 <div class="row ">
-    <div class="col-12 col-lg-12" style="margin-top:20px; width:100%">
-
-
-
+    <div class="col-lg-12 " style="align-content: center;">
         @include('Layout.alerts')
-
         <div class="card radius-10 border-top border-0 border-4 border-danger">
-
-
-
             <form method="post" id="product_form" action="{{ isset($product) ? route('post.logo.update', $product->id) : route('post.logo.store') }}" novalidate class="form-horizontal product_form">
                 @csrf
                 <input type="hidden" name="id" value="{{ $productID }}">
                 <div class="row">
-
-
-
-
-                    <div class="col-xs-12 col-sm-12">
+                    <div class="col-xs-12 col-sm-12 col-lg-12">
                         <div class="widget-box">
                             <div class="widget-header">
                                 <h4 class="widget-title">{{ isset($product) ? 'Update' : 'Create' }}</h4>
                             </div>
-                            <div class="widget-body" style="display: block;">
+                            <div class="widget-body">
 
                                 <div class="widget-main">
+
+
+                                    <div class="col-lg-12 col-sm-12">
+                                        <label for="tags"> Tags: </label>
+                                        <div class="">
+                                            <input type="text" id="tags" class="form-control" rows="3" value=" data-role=" tagsinput" />
+                                        </div>
+                                    </div>
 
                                     <div class="col-lg-4 col-sm-4">
                                         <label class="" for="form-field-1"> Category : </label>
@@ -71,18 +49,11 @@ if (isset($product)) {
                                             <select name="sub_cat_id" id="sub_category_id" class="chosen-select form-control select21" required style="width:100%">
                                                 <option> -- Select -- </option>
                                                 <?php foreach ($sub_category as $cat) : ?><optgroup label="<?= $cat->name ?>">
-                                                        <?php foreach ($cat->subCategories as $subCat) { ?> <option value="<?= $subCat->id ?>" <?= ($subCat->id == $subCategoryID)?'selected="selected"':'' ?>   ><?= $subCat->name ?></option> <?php } ?>
+                                                        <?php foreach ($cat->subCategories as $subCat) { ?> <option value="<?= $subCat->id ?>" <?= ($subCat->id == $subCategoryID) ? 'selected="selected"' : '' ?>><?= $subCat->name ?></option> <?php } ?>
                                                     </optgroup> <?php endforeach; ?>
                                             </select>
                                         </div>
                                     </div>
-
-
-
-                                    
-
-                                    
-
                                     <div style="clear:both;"></div>
                                     <div class="space"></div>
 
@@ -93,6 +64,10 @@ if (isset($product)) {
                                         </div>
                                     </div>
 
+
+
+
+
                                     <div style="clear:both;"></div>
                                     <div class="space"></div>
 
@@ -100,33 +75,15 @@ if (isset($product)) {
                                     <div class="col-lg-12 col-sm-12">
                                         <label for="form-field-1"> Description/Specification: </label>
                                         <div class="">
-                                           
+
                                             <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" id="form-field-8" placeholder="Description">{{old('description', (isset($product))? $product->post_content : '' ) }}</textarea>
                                         </div>
                                     </div>
-
-                                
-
                                     <div style="clear:both;"></div>
-
-
-
-
-
-
-
-                               
-
                                     <div class="col-lg-4">
                                         <label style="font-size:11px;">Product Image</label>
                                         <input type="file" name="product_image" id="file_2" />
-                                      </div>
-
-                                
-
-
-
-
+                                    </div>
                                     <div class="col-lg-4 col-sm-4">
                                         <label class="" for="form-field-1"> Status </label>
                                         <div class="">
@@ -135,9 +92,19 @@ if (isset($product)) {
                                     </div>
 
 
+                                    <div class="space-4"></div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right" for="form-field-tags">Tag input</label>
+
+                                        <div class="col-sm-9">
+                                            <div class="inline">
+                                                <input type="text" name="tags" id="form-field-tags" value="Tag Input Control" placeholder="Enter tags ..." />
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div style="clear:both;"></div>
-
-
                                 </div>
                             </div>
                             <div class="widget-footer">
@@ -174,7 +141,7 @@ if (isset($product)) {
 <script>
     let validator;
 
-   
+
 
 
     function checkValidation() {
@@ -238,21 +205,18 @@ if (isset($product)) {
 
     $(document).ready(function() {
 
-
-
-
-$('#file_2').ace_file_input({
-      no_file: 'No File ...',
-      btn_choose: 'Choose',
-      btn_change: 'Change',
-      droppable: false,
-      onchange: null,
-      thumbnail: false //| true | large
-      //whitelist:'gif|png|jpg|jpeg'
-      //blacklist:'exe|php'
-      //onchange:''
-      //
-    });
+        $('#file_2').ace_file_input({
+            no_file: 'No File ...',
+            btn_choose: 'Choose',
+            btn_change: 'Change',
+            droppable: false,
+            onchange: null,
+            thumbnail: false //| true | large
+            //whitelist:'gif|png|jpg|jpeg'
+            //blacklist:'exe|php'
+            //onchange:''
+            //
+        });
 
 
         validator = $('form.product_form').jbvalidator({
@@ -277,7 +241,7 @@ $('#file_2').ace_file_input({
         // });
 
 
-        
+
 
 
 

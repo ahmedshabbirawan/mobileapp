@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 use Nette\Utils\Image;
 use Illuminate\Support\Facades\Storage;
 
+use Saloon\XmlWrangler\XmlReader;
+
 class PostController extends Controller
 {
     public $resource;
@@ -48,6 +50,7 @@ class PostController extends Controller
 
             $results = Post::with(['user' => function($query) use ($request){}]
             )->select()->where(function ($query) use ($request) {
+                $query->where('post_type','logo');
 
             })->orderByRaw($column.' '.$sort)->get();
             
@@ -207,14 +210,6 @@ class PostController extends Controller
         }
     }
 
-
-
-
-
-
-
-
-
     function uploadProductImage(Request $request){
         $productName = Str::slug($request->get('name'));
         if($request->hasFile('product_image')){
@@ -269,6 +264,159 @@ class PostController extends Controller
         $emp->save();
         return array('status' => true);
     }
+
+
+
+    /**********************************************************************************************/
+    //          APIS                //
+
+    function readXml(){
+         $xmlString = file_get_contents(storage_path() . "/designs/business_74.xib");
+
+        $xml = simplexml_load_string($xmlString);
+
+        $json = json_encode($xml);
+        
+        $array = json_decode($json,TRUE);
+
+
+        dd($array['objects']['view']['subviews']);
+
+
+        // $xml = new \XMLReader();
+        // $xml->open(storage_path() . "/designs/business_74.xib");
+
+        // try {
+        //     while ($xml->read()) {
+               
+        //         if ($xml->nodeType == \XMLReader::ELEMENT) {
+
+                   
+
+        //             //assuming the values you're looking for are for each "item" element as an example
+        //             if ($xml->name == 'document') {
+
+        //               // dd($xml);
+
+        //                 $variable[++$counter] = new \stdClass();
+        //                 $variable[$counter]->thevalueyouwanttoget = '';
+
+        //             }
+        //             if ($xml->name == 'thevalueyouwanttoget') {
+        //                 $variable[$counter]->thevalueyouwanttoget = $xml->readString();
+        //             }
+        //         }
+        //     }
+        // } catch (Exception $e) {
+        //     echo $e->getMessage();
+        // } 
+        // finally() {
+        //     $xml->close();
+        // }
+
+        /*
+        $reader = XmlReader::fromString($xmlString);
+        // Retrieve all values as one simple array
+        $subView = $reader->value('subviews')->collect();
+        $image = $reader->value('subviews')->element('imageView.0')->sole()->element('rect')->getAttributes();
+        dd($image);
+        dd($reader->value('subviews')->collect()); 
+        */
+
+    }
+
+
+    function dataImport(Request $request){
+
+        if($request->ajax()){
+            // dd($request->all());
+
+
+            $file = $request->file('product_image');
+            $fileContents = file($file->getPathname());
+
+            $action = $request->get('action');
+
+
+
+            $templateArr = array();
+        
+            $index = 0;
+            foreach ($fileContents as $line) {
+                if( $index == 0 ){
+                    $index++;
+                    continue;
+                }
+                $index++;
+
+                $data = str_getcsv($line);
+
+                /*
+                if(!isset($templateArr[$data[0]])){
+                    $templateArr[$data[0]] = [
+                        'id' => $data[0],
+                        'name' => $data[1],
+                        'bounds' => $data[2],
+                    ];
+                }
+                $templateArr[$data[0]][$data[3]][] = [
+                    'type' => $data[4],
+                    'frame' => $data[5],
+                    'text' => $data[6],
+                    'font_name' => $data[7],
+                    'font_size' => $data[8],
+                    'font_color' => $data[9],
+                    'image_name' => $data[10]
+                ];
+                */
+
+
+                if(!isset($templateArr[$data[0]])){
+                    $templateArr[$data[0]] = [
+                        'id' => $data[0],
+                        'name' => $data[1],
+                        'bounds' => $data[2],
+                    ];
+                }
+                $templateArr[$data[0]]['layers'][$data[3]][] = [
+                    'type' => $data[4],
+                    'frame' => $data[5],
+                    'text' => $data[6],
+                    'font_name' => $data[7],
+                    'font_size' => $data[8],
+                    'font_color' => $data[9],
+                    'image_name' => $data[10]
+                ];
+
+
+
+            }
+
+            if($action == 'insert'){
+                foreach($templateArr as $template){
+                    Post::create([
+                        'post_type' => 'logo',
+                        'post_title' => $template['name'],
+                        'post_content' => json_encode($template),
+                        'post_author' => 1
+                    ]);
+                }
+                $view = '<p>Insert successfully!</p>';                
+            }else{
+                $view = $templateArr;
+            }
+
+            return response()->json([
+                'message' => 'Done',
+                'view' => $view 
+            ]);
+
+        }else{
+            return view($this->view.'data_import');
+        }
+
+    }
+
 
 
 }

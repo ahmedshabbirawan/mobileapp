@@ -85,7 +85,7 @@
 
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
 
-<div class="row" >
+<div class="row" style="display: none;" >
 <style>
     .total_label{
         margin: 0px; font-size: 13px;
@@ -143,7 +143,7 @@
                                 <i class="ace-icon fa fa-check green"></i>
                                 Welcome to <strong class="green">IMS</strong>
                             </div> -->
-                            <div class="row">
+                            <div class="row" style="display: none;">
                             <div class="col-xs-12 col-sm-12 widget-container-col ui-sortable" id="widget-container-col-2">
 											<div class="widget-box widget-color-green2" id="widget-box-2">
 												<div class="widget-header">

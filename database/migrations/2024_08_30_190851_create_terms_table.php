@@ -19,6 +19,7 @@ class CreateTermsTable extends Migration
             $table->text('slug')->nullable();
             $table->text('taxonomy')->nullable();
             $table->longText('description')->nullable();
+            $table->longText('childs')->nullable();
             $table->text('image')->nullable();
             $table->integer('parent')->default(0);
             $table->integer('count')->default(0);

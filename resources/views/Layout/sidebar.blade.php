@@ -44,8 +44,14 @@
 
                     @can('logo.create')
                     @endcan
+                    
                     <li class="{{request()->is('post/logo/create*') ? 'active' : '' }}">
                         <a href="{{ route('post.logo.create') }}"><i class="menu-icon fa fa-caret-right"></i>Add</a>
+                        <b class="arrow"></b>
+                    </li>
+
+                    <li class="{{request()->is('post/logo/create*') ? 'active' : '' }}">
+                        <a href="{{ route('post.logo.data_import') }}"><i class="menu-icon fa fa-caret-right"></i>Data Import</a>
                         <b class="arrow"></b>
                     </li>
                     

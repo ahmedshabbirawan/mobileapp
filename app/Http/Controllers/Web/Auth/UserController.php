@@ -82,15 +82,15 @@ class UserController extends Controller{
             'email'     => 'required',
             'username'  => 'required',
             'password'  => 'required',
-            'roleId' => [
-                'required',                
-                function ($attribute, $value, $fail) use ($request) {
-                    $shopID = $request->get('shop_id');
-                    if($shopID == ''){
-                        $fail('The Shop ID is required.');
-                    }
-                },
-            ],
+            // 'roleId' => [
+            //     'required',                
+            //     function ($attribute, $value, $fail) use ($request) {
+            //         $shopID = $request->get('shop_id');
+            //         if($shopID == ''){
+            //             $fail('The Shop ID is required.');
+            //         }
+            //     },
+            // ],
         ]);
         if ($validator->fails()) {
             if($request->ajax()){

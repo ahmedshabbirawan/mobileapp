@@ -174,6 +174,10 @@ Route::group(['prefix' => 'post', 'as' => 'post.'], function () {
         Route::get('/status/{id}', [PostController::class, 'status'])->name('status'); //->middleware('permission:product.status');
         Route::get('/delete/{id}', [PostController::class, 'destroy'])->name('delete'); //->middleware('permission:product.delete');
         Route::get('/view/{id}', [PostController::class, 'show'])->name('view'); //->middleware('permission:product.read');
+        Route::get('/data-import', [PostController::class, 'dataImport'])->name('data_import');
+        Route::post('/data-import', [PostController::class, 'dataImport'])->name('data_import_post');
+
+
     });
 
 });
