@@ -65,6 +65,7 @@ class AppPostController extends Controller
             'post_content' => $description,
             'post_author' =>  (auth()->user())? optional(auth()->user())->id:'',
             'post_status' => $status,
+            'post_type' => 'logo'
         );
         try{
             $product    = Post::create($array);
