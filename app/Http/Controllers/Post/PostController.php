@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Nette\Utils\Image;
 use Illuminate\Support\Facades\Storage;
 
-use Saloon\XmlWrangler\XmlReader;
+
 
 class PostController extends Controller
 {

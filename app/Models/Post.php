@@ -21,8 +21,9 @@ use Illuminate\Support\Facades\Storage;
 
 
 class Post extends Model{ //  implements Auditable{
-    use HasFactory, Definitions, CurdBy, SoftDeletes; 
-    // \OwenIt\Auditing\Auditable, 
+    use HasFactory, Definitions,  SoftDeletes; 
+    // \OwenIt\Auditing\Auditable,
+    // CurdBy, 
     protected $table="posts";
 
     protected $fillable = [
@@ -58,7 +59,7 @@ class Post extends Model{ //  implements Auditable{
 
     protected static function booted() {
         parent::boot();
-        self::curdBy();
+      //   self::curdBy();
     }
     public function getStatusLabelAttribute($value){
         return self::statusLabel($this->status);
