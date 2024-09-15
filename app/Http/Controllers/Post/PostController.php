@@ -371,6 +371,23 @@ class PostController extends Controller
                 */
 
 
+                // if(!isset($templateArr[$data[0]])){
+                //     $templateArr[$data[0]] = [
+                //         'id' => $data[0],
+                //         'name' => $data[1],
+                //         'bounds' => $data[2],
+                //     ];
+                // }
+                // $templateArr[$data[0]]['layers'][$data[3]][] = [
+                //     'type' => $data[4],
+                //     'frame' => $data[5],
+                //     'text' => $data[6],
+                //     'font_name' => $data[7],
+                //     'font_size' => $data[8],
+                //     'font_color' => $data[9],
+                //     'image_name' => $data[10]
+                // ];
+
                 if(!isset($templateArr[$data[0]])){
                     $templateArr[$data[0]] = [
                         'id' => $data[0],
@@ -378,14 +395,14 @@ class PostController extends Controller
                         'bounds' => $data[2],
                     ];
                 }
-                $templateArr[$data[0]]['layers'][$data[3]][] = [
-                    'type' => $data[4],
-                    'frame' => $data[5],
-                    'text' => $data[6],
-                    'font_name' => $data[7],
-                    'font_size' => $data[8],
-                    'font_color' => $data[9],
-                    'image_name' => $data[10]
+                $templateArr[$data[0]][] = [
+                    'type' => $data[3],
+                    'frame' => $data[4],
+                    'text' => $data[5],
+                    'font_name' => $data[6],
+                    'font_size' => $data[7],
+                    'font_color' => $data[8],
+                    'image_name' => $data[9]
                 ];
 
 
@@ -403,7 +420,7 @@ class PostController extends Controller
                 }
                 $view = '<p>Insert successfully!</p>';                
             }else{
-                $view = $templateArr;
+                $view = json_encode($templateArr);
             }
 
             return response()->json([
