@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Post\AppPostController;
+use App\Http\Controllers\Media\AppMediaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,4 +32,18 @@ Route::group(['prefix' => 'post', 'as' => 'api.post.'], function () {
         Route::delete('/delete/{id}', [AppPostController::class, 'destroy'])->name('delete');
         Route::get('/view/{id}', [AppPostController::class, 'show'])->name('view'); 
     });
+});
+
+
+
+
+Route::group(['prefix' => 'media', 'as' => 'api.media.'], function () {
+
+        Route::get('/list', [AppMediaController::class, 'index'])->name('list');
+        Route::post('/store', [AppMediaController::class, 'store'])->name('store');
+        Route::post('/update/{id}', [AppMediaController::class, 'update'])->name('update');
+        Route::get('/status/{id}', [AppMediaController::class, 'status'])->name('status');
+        Route::delete('/delete/{id}', [AppMediaController::class, 'destroy'])->name('delete');
+        Route::get('/view/{id}', [AppMediaController::class, 'show'])->name('view'); 
+    
 });
