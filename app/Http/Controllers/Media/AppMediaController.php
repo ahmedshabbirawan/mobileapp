@@ -90,38 +90,10 @@ class AppMediaController extends Controller
                 }
                 return response()->json(['data' => $mediaFiles, 'message' => count($mediaFiles).' files uploaded successfully.' ]);
             }catch(\Exception $e){
-                return [false,$e->getMessage()];
+                return response()->json(['data' => [], 'message' => $e->getMessage() ],500);
             }
         }
-
-
-        
-
-
-
-        if($request->hasFile('product_image')){ 
-            $imageObj = $this->uploadProductImage($request);
-            if(  !($imageObj[0]) ){
-                return response()->json(['message' => $imageObj[1]], 500);
-            }else{
-                $imageName = $imageObj[1];
-            }
-        }
-
-        $array = array(
-            'post_title' => $name,
-            // 'post_content' => $description,
-            'post_author' =>  (auth()->user())? optional(auth()->user())->id:'',
-            'post_status' => $status,
-            'post_type' => 'attachment'
-        );
-        try{
-            $product    = Post::create($array);
-            return response()->json(['status' => true, 'data' => ['logo' => $product], 'message' => 'Logo Add successfully.' ]);
-        }catch(\Exception $e){
-            DB::rollBack();
-            return response()->json(['message' => $e->getLine(). ' : '. $e->getFile() .' : Error.Please Contact   Support'. $e->getMessage()], 500);
-        }
+        return response()->json(['data' => [], 'message' => 'No image found!' ],422);
     }
 
 

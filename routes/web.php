@@ -19,6 +19,7 @@ use App\Http\Controllers\Web\Product\ProductController;
 
 
 use App\Http\Controllers\Post\PostController;
+use App\Http\Controllers\Media\MediaController;
 
 use App\Http\Controllers\Term\TermController;
 
@@ -176,10 +177,25 @@ Route::group(['prefix' => 'post', 'as' => 'post.'], function () {
         Route::get('/view/{id}', [PostController::class, 'show'])->name('view'); //->middleware('permission:product.read');
         Route::get('/data-import', [PostController::class, 'dataImport'])->name('data_import');
         Route::post('/data-import', [PostController::class, 'dataImport'])->name('data_import_post');
-
-
     });
 
+    
+
+});
+
+
+
+Route::group(['prefix' => 'media', 'as' => 'media.'], function () {
+    Route::get('/list', [MediaController::class, 'index'])->name('list'); //->middleware('permission:product.read');
+    Route::get('/create', [MediaController::class, 'create'])->name('create'); //->middleware('permission:product.create');
+    Route::post('store', [MediaController::class, 'store'])->name('store'); //->middleware('permission:product.create');
+    Route::get('/edit/{id}', [MediaController::class, 'edit'])->name('edit'); //->middleware('permission:product.update');
+    Route::post('/update/{id}', [MediaController::class, 'update'])->name('update'); //->middleware('permission:product.update');
+    Route::get('/status/{id}', [MediaController::class, 'status'])->name('status'); //->middleware('permission:product.status');
+    Route::get('/delete/{id}', [MediaController::class, 'destroy'])->name('delete'); //->middleware('permission:product.delete');
+    Route::get('/view/{id}', [MediaController::class, 'show'])->name('view'); //->middleware('permission:product.read');
+    Route::get('/data-import', [MediaController::class, 'dataImport'])->name('data_import');
+    Route::post('/data-import', [MediaController::class, 'dataImport'])->name('data_import_post');
 });
 
 

@@ -146,6 +146,37 @@
             <!--------------- End User -------------------->
 
 
+
+             <!--------------- User -------------------->
+             <li class="{{request()->is('user*') ? 'active open' : '' }}">
+                <a href="#" class="dropdown-toggle ">
+                    <i class="menu-icon fa fa-image"></i>
+                    <span class="menu-text">
+                        Image Gallery
+                    </span>
+                    <b class="arrow fa fa-angle-down"></b>
+                </a>
+
+                <b class="arrow"></b>
+
+                <ul class="submenu">
+                    <li class="{{request()->is('user/list*') ? 'active' : '' }}">
+                        <a href="{{ route('media.list') }}"><i class="menu-icon fa fa-caret-right"></i>List</a><b class="arrow"></b>
+                    </li>
+                    <li class="{{request()->is('user/create*') ? 'active' : '' }}">
+                        <a href="{{ route('media.create') }}"><i class="menu-icon fa fa-caret-right"></i>Add New</a><b class="arrow"></b>
+                    </li>
+                    @can('customer.read')
+                    
+                    @endcan
+                    @can('customer.create')
+                    
+                    @endcan
+                </ul>
+            </li>
+            <!--------------- End User -------------------->
+
+
         
 
 
