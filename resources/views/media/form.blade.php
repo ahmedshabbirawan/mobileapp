@@ -40,7 +40,7 @@ if (isset($product)) {
 
 
                                     
-
+<p id="msg-div"></p>
 
 
 
@@ -105,6 +105,7 @@ if (isset($product)) {
 
         var errorCount = validator.checkAll();
         if (errorCount == 0) {
+            $('#msg-div').html('Files uploading......');
             $.ajax({
                 data: fdata,
                 cache: false,
@@ -119,7 +120,9 @@ if (isset($product)) {
                 success: function(res, textStatus, jqXHR) {
                     // console.log('=======>>>>> ',res);
                     if (jqXHR.status == 200) {
-                        if (typeof res.data.post !== 'undefined') {
+
+                        $('#msg-div').html(res.message);
+
                             $.confirm({
                                 title: 'Success',
                                 content: res.message,
@@ -132,7 +135,7 @@ if (isset($product)) {
                                     }
                                 }
                             });
-                        }
+                        
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
