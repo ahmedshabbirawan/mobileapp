@@ -65,7 +65,7 @@
                                 </div>
                             </div>
 
-                            <div class="widget-body" id="req_response"></div>
+                            <div class="widget-body" ><pre id="req_response"></pre></div>
 
                         </div>
                     </div><!-- /.span -->

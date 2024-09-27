@@ -1,7 +1,7 @@
 @extends('Layout.master')
 
 @section('title')
-Logo
+Templates
 @endsection
 
 @section('content')
@@ -10,7 +10,7 @@ Logo
 
 <div class="page-header" style="min-height:40px;">
     <div class="" style="float: left;">
-        <h1>Logo</h1>
+        <h1>Templates</h1>
     </div>
     <div class="" style="float: right;">
         <a href="{{ route('post.logo.create') }}" class="btn btn-xs btn-light bigger"><i class="ace-icon fa fa-floppy-o"></i> Add Record </a> 

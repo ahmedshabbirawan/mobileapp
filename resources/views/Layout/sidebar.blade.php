@@ -28,7 +28,7 @@
                 <a href="#" class="dropdown-toggle ">
                     <i class="menu-icon ace-icon glyphicon glyphicon-picture "></i>
                     <span class="menu-text">
-                        Logo
+                        Templates
                     </span>
                     <b class="arrow fa fa-angle-down"></b>
                 </a>

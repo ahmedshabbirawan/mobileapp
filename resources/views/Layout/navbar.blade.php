@@ -22,14 +22,14 @@
         <div class="navbar-buttons navbar-header pull-right" role="navigation">
             <ul class="nav ace-nav">
 
-            <li style="display: none;" class="grey dropdown-modal">
+            <li class="grey dropdown-modal hidden">
                     <a  onclick="pos_app.changeCurrentShopModal();" href="javascript:void(0);">
                         Shop : {{ optional(auth()->user()->shop)->name }} 
                     </a>
             </li>
 
                 <li class="grey dropdown-modal">
-                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                    <a data-toggle="dropdown" class="dropdown-toggle hidden" href="#">
                         <i class="ace-icon fa fa-tasks"></i>
                         <span class="badge badge-grey">4</span>
                     </a>
@@ -106,7 +106,7 @@
                 </li>
 
                 <li class="purple dropdown-modal">
-                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                    <a data-toggle="dropdown" class="dropdown-toggle hidden" href="#">
                         <i class="ace-icon fa fa-bell icon-animated-bell"></i>
                         <span class="badge badge-important">8</span>
                     </a>
@@ -174,7 +174,7 @@
                 </li>
 
                 <li class="green dropdown-modal">
-                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                    <a data-toggle="dropdown" class="dropdown-toggle hidden" href="#">
                         <i class="ace-icon fa fa-envelope icon-animated-vertical"></i>
                         <span class="badge badge-success">5</span>
                     </a>

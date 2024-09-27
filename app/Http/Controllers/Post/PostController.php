@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Post;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Models\PostTerm;
+use App\Models\SubView;
+use App\Models\Term;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Str;
@@ -87,18 +90,27 @@ class PostController extends Controller
     }
 
     public function create(){
-        $this->viewData['category']     = []; //Category::with('subCategories')->orderBy('name','DESC')->get();
-        $this->viewData['uoms']         = []; // Uom::orderBy('code','ASC')->get()->pluck('code','id');
+        // $this->viewData['row'] = [];
+        $this->viewData['category'] = Term::all()->pluck('name','id');
         return view($this->view.'create',$this->viewData);
     }
 
     public function store(Request $request){
         $name           = $request->get('name');
         $description    = $request->get('description');
-        $uom_id         = $request->get('uom_id');
         $status         = $request->get('status');
-        $price          = $request->get('price');
         $imageName      = null;
+
+        $subViewIds = $request->get('sub_view_id');
+        $types = $request->get('type');
+        $frames = $request->get('frame');
+        $texts = $request->get('text');
+        $fontNames = $request->get('font_name');
+        $fontSizes = $request->get('font_size');
+        $textColors = $request->get('text_color');
+        $imageNames = $request->get('image_name');
+
+        $categories = $request->get('category');
         
         if($request->hasFile('product_image')){ 
             $imageObj = $this->uploadProductImage($request);
@@ -108,21 +120,47 @@ class PostController extends Controller
                 $imageName = $imageObj[1];
             }
         }
-
         $array = array(
             'post_title' => $name,
-            'post_content' => $description,
+            'post_content' => '',
             'post_author' => auth()->user()->id,
             'post_status' => $status,
+            'post_type' => 'logo'
         );
-
-
-        
-
         try{
             DB::beginTransaction();
             $product    = Post::create($array);
-            $insertArr = [];
+            $index = 0;
+            foreach($types as $type){
+                $subViewId = $subViewIds[$index];
+
+                $subView['type'] =  $type;
+                $subView['frame'] =  $frames[$index];
+                $subView['text'] =  $texts[$index];
+                $subView['font_name'] =  $fontNames[$index];
+                $subView['font_size'] =  $fontSizes[$index];
+                $subView['text_color'] =  $textColors[$index];
+                $subView['image_name'] =  $imageNames[$index];
+                $subView['post_id'] = $product->id;
+
+                if($subViewId){
+                    SubView::where('id', $subViewId)->update($subView);
+                }else{
+                    SubView::create($subView);
+                }
+                $index++;
+            }
+
+            $catIndex = 0;
+            foreach($categories as $cat){
+                $categoryId = $cat[$catIndex];
+                PostTerm::create([
+                    'post_id' => $product->id,
+                    'term_id' => $categoryId
+                ]);
+            }
+
+
             DB::commit();
 
             if($request->ajax()){
@@ -134,7 +172,7 @@ class PostController extends Controller
             
         }catch(\Exception $e){
             DB::rollBack();
-            return response()->json(['message' => 'Error.Please Contact   Support'. $e->getMessage()], 500);
+            return response()->json(['message' => $e->getLine() .' : Error : Please Contact Support'. $e->getMessage()], 500);
             // return redirect()->route('category.sub.list')->with('error','Error.Please Contact   Support');
         }
     }
@@ -145,41 +183,94 @@ class PostController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function show(Product $product, $id){
-        $product = Product::find($id);
-        $this->viewData['row'] = $product;
-        $this->viewData['categories']   = $product->categories_tree();
+    public function show(Post $post, $id){
+        $this->viewData['row'] = Post::find($id);
+        $this->viewData['category'] = Term::all()->pluck('name','id');
+        $this->viewData['subview'] = SubView::where('post',$id)->get();
         return view($this->view.'detail_new',$this->viewData);
     }
 
 
     public function edit(Post $product,$id){
-        
-        $product = Post::find($id);
-        $this->viewData['product']      = $product;
-        $this->viewData['categories']   = []; // $product->categories_tree();
+        $this->viewData['row'] = Post::find($id);
+        $this->viewData['category'] = Term::all()->pluck('name','id');
+        $this->viewData['post_category'] = PostTerm::where('post_id',$id)->pluck('term_id')->toArray();
+        $this->viewData['subview'] = SubView::where('post_id',$id)->get();
         return view($this->view.'edit',$this->viewData);
     }
 
 
-    public function update(Request $request, Post $product){
-
-        $productID = $request->get('id');
+    public function update(Request $request, Post $product, $id){
+        $product = Post::find($id);
         $name           = $request->get('name');
         $description    = $request->get('description');
         $status         = $request->get('status');
+        $imageName      = null;
+        $postSubView    = SubView::where('post_id',$id)->pluck('id')->toArray();
+
+        $subViewIds = $request->get('sub_view_id');
+        $types = $request->get('type');
+        $frames = $request->get('frame');
+        $texts = $request->get('text');
+        $fontNames = $request->get('font_name');
+        $fontSizes = $request->get('font_size');
+        $textColors = $request->get('text_color');
+        $imageNames = $request->get('image_name');
+
+        $categories = $request->get('category');
 
         $array = array(
             'post_title' => $name,
-            'post_content' => $description,
+            'post_content' => '',
             'post_author' => auth()->user()->id,
             'post_status' => $status,
-           //  'image' => $imageName
+            'post_type' => 'logo'
         );
 
-       try{
+        try{
             DB::beginTransaction();
-            Post::where('id',$productID)->update($array);
+            Post::where('id',$id)->update($array);
+
+            foreach($postSubView as $postSubviewId){
+                if(!in_array($postSubviewId,$subViewIds)){
+                    SubView::where(['post_id' => $id, 'id' => $postSubviewId])->delete();
+                }
+            }
+            
+          //  dd($subViewIds);
+
+            $index = 0;
+            foreach($types as $type){
+                $subViewId = $subViewIds[$index];
+
+                $subView['type'] =  $type;
+                $subView['frame'] =  $frames[$index];
+                $subView['text'] =  $texts[$index];
+                $subView['font_name'] =  $fontNames[$index];
+                $subView['font_size'] =  $fontSizes[$index];
+                $subView['text_color'] =  $textColors[$index];
+                $subView['image_name'] =  $imageNames[$index];
+                $subView['post_id'] = $product->id;
+
+                if($subViewId){
+                    SubView::where('id', $subViewId)->update($subView);
+                }else{
+                    SubView::create($subView);
+                }
+                $index++;
+            }
+            $catIndex = 0;
+            foreach($categories as $cat){
+                $categoryId = $cat[$catIndex];
+                $postCat = [
+                    'post_id' => $product->id,
+                    'term_id' => $categoryId
+                ];
+                $postCat = PostTerm::where($postCat)->first();
+                if(!$postCat){
+                    PostTerm::create($postCat);
+                }
+            }
             DB::commit();
             if($request->ajax()){
                 return response(['status' => true, 'data' => ['post' => $product], 'message' => 'Post Update successfully.' ]);
@@ -188,7 +279,7 @@ class PostController extends Controller
             }
         }catch(\Exception $e){
             DB::rollBack();
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getLine() .' : Error : Please Contact Support'. $e->getMessage()], 500);
             // return redirect()->route('category.sub.list')->with('error','Error.Please Contact   Support');
         }
     }
@@ -329,16 +420,9 @@ class PostController extends Controller
     function dataImport(Request $request){
 
         if($request->ajax()){
-            // dd($request->all());
-
-
             $file = $request->file('product_image');
             $fileContents = file($file->getPathname());
-
             $action = $request->get('action');
-
-
-
             $templateArr = array();
         
             $index = 0;
@@ -348,18 +432,17 @@ class PostController extends Controller
                     continue;
                 }
                 $index++;
-
                 $data = str_getcsv($line);
 
-                /*
                 if(!isset($templateArr[$data[0]])){
                     $templateArr[$data[0]] = [
                         'id' => $data[0],
                         'name' => $data[1],
-                        'bounds' => $data[2],
+                        'categories' => $data[2],
+                        'bounds' => $data[3],
                     ];
                 }
-                $templateArr[$data[0]][$data[3]][] = [
+                $templateArr[$data[0]]['sub_views'][] = [
                     'type' => $data[4],
                     'frame' => $data[5],
                     'text' => $data[6],
@@ -368,56 +451,82 @@ class PostController extends Controller
                     'font_color' => $data[9],
                     'image_name' => $data[10]
                 ];
-                */
-
-
-                // if(!isset($templateArr[$data[0]])){
-                //     $templateArr[$data[0]] = [
-                //         'id' => $data[0],
-                //         'name' => $data[1],
-                //         'bounds' => $data[2],
-                //     ];
-                // }
-                // $templateArr[$data[0]]['layers'][$data[3]][] = [
-                //     'type' => $data[4],
-                //     'frame' => $data[5],
-                //     'text' => $data[6],
-                //     'font_name' => $data[7],
-                //     'font_size' => $data[8],
-                //     'font_color' => $data[9],
-                //     'image_name' => $data[10]
-                // ];
-
-                if(!isset($templateArr[$data[0]])){
-                    $templateArr[$data[0]] = [
-                        'id' => $data[0],
-                        'name' => $data[1],
-                        'bounds' => $data[2],
-                    ];
-                }
-                $templateArr[$data[0]][] = [
-                    'type' => $data[3],
-                    'frame' => $data[4],
-                    'text' => $data[5],
-                    'font_name' => $data[6],
-                    'font_size' => $data[7],
-                    'font_color' => $data[8],
-                    'image_name' => $data[9]
-                ];
-
-
-
             }
 
+            // dd(templateArr);
+
             if($action == 'insert'){
+
+
+                try{
+
+
                 foreach($templateArr as $template){
-                    Post::create([
+
+
+                  
+
+                    $post = Post::create([
                         'post_type' => 'logo',
                         'post_title' => $template['name'],
-                        'post_content' => json_encode($template),
+                        'post_content' => '',//json_encode($template),
                         'post_author' => 1
                     ]);
+
+                    $categories = explode(',',$template['categories']);
+
+                    foreach($categories as  $category){
+                        $categoryId = $this->getCategoryIdByName($category);
+                        PostTerm::create([
+                            'post_id' => $post->id,
+                            'term_id' => $categoryId
+                        ]);
+                    }
+
+                    foreach($template['sub_views'] as  $subView){
+
+
+                    //     dd([
+                    //         'post_type' => 'logo',
+                    //         'post_title' => $template['name'],
+                    //         'post_content' => '', // json_encode($template),
+                    //         'post_author' => 1
+                    //     ],
+                    //     [
+                    //        //  'post_id' => $post->id,
+                    //         'type' => $subView['type'],
+                    //         'frame' => $subView['frame'],
+                    //         'text' => $subView['text'],
+                    //         'font_name' => $subView['font_name'],
+                    //         'font_size' => $subView['font_size'],
+                    //         'font_color' => $subView['font_color'],
+                    //         'image_name' => $subView['image_name'],
+                    //     ]
+                    // );
+
+                     //   dd($subView);
+                        SubView::create([
+                            'post_id' => $post->id,
+                            'type' => $subView['type'],
+                            'frame' => $subView['frame'],
+                            'text' => $subView['text'],
+                            'font_name' => $subView['font_name'],
+                            'font_size' => $subView['font_size'],
+                            'font_color' => $subView['font_color'],
+                            'image_name' => $subView['image_name'],
+                        ]); 
+                    }
+
+                
+
+
                 }
+
+            }catch(\Exception $e){
+                return response()->json(['message' => $e->getLine() .' : Error : Please Contact Support'. $e->getMessage()], 500);
+                // return redirect()->route('category.sub.list')->with('error','Error.Please Contact   Support');
+            }
+
                 $view = '<p>Insert successfully!</p>';                
             }else{
                 $view = json_encode($templateArr);
@@ -434,6 +543,18 @@ class PostController extends Controller
 
     }
 
+
+    function getCategoryIdByName($name){
+        $term = Term::where('name',$name)->first();
+        if($term){
+            return $term->id;
+        }else{
+            $term = Term::create([
+                'name' => $name
+            ]);
+            return $term->name;
+        }
+    }
 
 
 }

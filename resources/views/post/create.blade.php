@@ -1,13 +1,13 @@
 @extends('Layout.master')
 
 @section('title')
- Create Logo
+ Create Template
 @endsection
 
 @section('content')
 
 <div class="page-content">
-<div class="page-header"><h1>Logos</h1></div>
+<div class="page-header"><h1>Template Create</h1></div>
 
 @include('post.form')
 

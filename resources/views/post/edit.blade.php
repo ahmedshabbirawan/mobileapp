@@ -1,12 +1,12 @@
 @extends('Layout.master')
 
 @section('title')
-Post
+Template
 @endsection
 
 @section('content')
 <div class="page-content">
-<div class="page-header"><h1>Post</h1></div>
+<div class="page-header"><h1>Template Update</h1></div>
 @include('post.form')
 </div>
 @endsection
