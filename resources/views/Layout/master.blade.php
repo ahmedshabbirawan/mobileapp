@@ -25,7 +25,7 @@
 		<link rel="stylesheet" href="{{asset('assets/css/daterangepicker.min.css')}}" />
 		<link rel="stylesheet" href="{{asset('assets/css/bootstrap-datetimepicker.min.css')}}" />
 
-
+		<link rel="stylesheet" href="{{asset('assets/css/jquery-ui.min.css')}}" />
 
 		<!-- text fonts -->
 		<link rel="stylesheet" href="{{asset('assets/css/fonts.googleapis.com.css')}}" />
@@ -186,6 +186,8 @@
 
 <script src="{{asset('assets/js/loadingoverlay.min.js')}}"></script>
 
+<script type="text/javascript" src="{{asset('assets/js/gofrendi.chosen.ajaxify.js')}}"></script>
+<script type="text/javascript" src="{{asset('assets/js/jquery-ui.min.js')}}"></script>
 
 
 		<!-- ace scripts -->

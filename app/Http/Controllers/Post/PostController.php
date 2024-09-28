@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Post;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PostFromRequest;
 use App\Models\Post;
 use App\Models\PostTerm;
 use App\Models\SubView;
 use App\Models\Term;
+use App\Util\Util;
 use Illuminate\Http\Request;
+
 
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
@@ -38,6 +41,24 @@ class PostController extends Controller
         $this->adminURL     = $this->viewData['adminURL']     =   url('/post');
         $this->table        = 'posts';
         $this->view         = 'post.';
+    }
+
+
+    function searchImage(Request $request){
+        $query = $request->get('query');
+
+        $medias = Post::where('post_type','attachment')
+        // ->whereLike('name', '%'.$query.'%')
+        ->limit(15)->get();
+        $mediaArr = array();
+        foreach($medias as $media){
+            $mediaArr[] = [
+                'id' => $media->id,
+                'title' => $media->post_title,
+                'img' => Util::imageUrl($media->guid)
+            ];
+        }
+        return $mediaArr;
     }
 
 
@@ -95,7 +116,7 @@ class PostController extends Controller
         return view($this->view.'create',$this->viewData);
     }
 
-    public function store(Request $request){
+    public function store(PostFromRequest $request){
         $name           = $request->get('name');
         $description    = $request->get('description');
         $status         = $request->get('status');
@@ -200,7 +221,7 @@ class PostController extends Controller
     }
 
 
-    public function update(Request $request, Post $product, $id){
+    public function update(PostFromRequest $request, Post $product, $id){
         $product = Post::find($id);
         $name           = $request->get('name');
         $description    = $request->get('description');
@@ -359,64 +380,7 @@ class PostController extends Controller
 
 
     /**********************************************************************************************/
-    //          APIS                //
-
-    function readXml(){
-         $xmlString = file_get_contents(storage_path() . "/designs/business_74.xib");
-
-        $xml = simplexml_load_string($xmlString);
-
-        $json = json_encode($xml);
-        
-        $array = json_decode($json,TRUE);
-
-
-        dd($array['objects']['view']['subviews']);
-
-
-        // $xml = new \XMLReader();
-        // $xml->open(storage_path() . "/designs/business_74.xib");
-
-        // try {
-        //     while ($xml->read()) {
-               
-        //         if ($xml->nodeType == \XMLReader::ELEMENT) {
-
-                   
-
-        //             //assuming the values you're looking for are for each "item" element as an example
-        //             if ($xml->name == 'document') {
-
-        //               // dd($xml);
-
-        //                 $variable[++$counter] = new \stdClass();
-        //                 $variable[$counter]->thevalueyouwanttoget = '';
-
-        //             }
-        //             if ($xml->name == 'thevalueyouwanttoget') {
-        //                 $variable[$counter]->thevalueyouwanttoget = $xml->readString();
-        //             }
-        //         }
-        //     }
-        // } catch (Exception $e) {
-        //     echo $e->getMessage();
-        // } 
-        // finally() {
-        //     $xml->close();
-        // }
-
-        /*
-        $reader = XmlReader::fromString($xmlString);
-        // Retrieve all values as one simple array
-        $subView = $reader->value('subviews')->collect();
-        $image = $reader->value('subviews')->element('imageView.0')->sole()->element('rect')->getAttributes();
-        dd($image);
-        dd($reader->value('subviews')->collect()); 
-        */
-
-    }
-
-
+    //          DataImport                //
     function dataImport(Request $request){
 
         if($request->ajax()){

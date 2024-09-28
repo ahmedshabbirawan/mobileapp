@@ -58,7 +58,7 @@ class MediaController extends Controller
             $datatable =  Datatables::of($results)
             ->addColumn('image_thumb', function ($row) {
                 $imagePath = self::getFilePath($row->guid);
-                return '<img src="'.$imagePath.'" width="200" height="200" >';
+                return '<img src="'.$imagePath.'" width="75" height="75" >';
             })->addColumn('user_name', function ($row) {
                 return '';
             })->addColumn('action', function ($row) {

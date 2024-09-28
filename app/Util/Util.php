@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Models\AttributeType;
+use Illuminate\Support\Facades\Storage;
 
 class Util extends Model{
     use HasFactory;	
@@ -64,6 +65,11 @@ class Util extends Model{
     static function designations(){
         return ['Store Manager', 'Store Keeper', 'Gate Keeper'];
       }
+
+
+    static function imageUrl($fileName, $full=null){
+        return Storage::disk('public')->url('post_images/'.$fileName); 
+    }  
 
 
 

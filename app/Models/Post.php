@@ -4,20 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\Definitions;
-use App\Traits\CurdBy;
-use App\Enums\Attri;
-use App\Models\ProductCategory;
-
-use App\Models\ProductAvailable;
-
-use App\Models\ProductAttribute;
-use App\Models\AttributeValue;
-use App\Models\AttributeType;
-use Illuminate\Support\Facades\Storage;
 
 
 class Post extends Model{ //  implements Auditable{
@@ -32,6 +20,7 @@ class Post extends Model{ //  implements Auditable{
         'post_date_gmt',
         'post_content',
         'post_title',
+        'original_file_name',
         'post_excerpt',
         'post_status',
         'comment_status',

@@ -166,6 +166,8 @@ Route::middleware(['web', 'auth'])->group(function () {
 
 Route::group(['prefix' => 'post', 'as' => 'post.'], function () {
 
+    Route::get('/search-image', [PostController::class, 'searchImage'])->name('search_image'); 
+
     Route::group(['prefix' => 'logo', 'as' => 'logo.'], function () {
         Route::get('/list', [PostController::class, 'index'])->name('list'); //->middleware('permission:product.read');
         Route::get('/create', [PostController::class, 'create'])->name('create'); //->middleware('permission:product.create');

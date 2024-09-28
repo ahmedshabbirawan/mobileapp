@@ -1,6 +1,10 @@
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 
-
+<style>
+.ui-menu{
+    z-index: 5455;
+}    
+</style>
 <?php
 $subCategoryID      = '';
 $name = '';
@@ -36,7 +40,7 @@ if (isset($product)) {
                                 <div class="widget-main">
 
                                     <div class="col-lg-12 col-sm-12">
-                                        <label for="form-field-1"> Title: </label>
+                                        <label for="form-field-1"> Title </label>
                                         <div class="">
                                             <input type="text" required class="form-control @error('name') is-invalid @enderror" value="{{old('name', (isset($row))? $row->post_title : '' )}}" name="name" id="name" placeholder="Name">
                                         </div>
@@ -46,20 +50,22 @@ if (isset($product)) {
                                     <div class="space"></div>
 
                                     <div class="col-lg-4 col-sm-4">
-                                        <label class="" for="form-field-1"> Category : </label>
+                                        <label class="" for="form-field-1"> Category</label>
                                         <div>
-                                            <select name="category[]" id="sub_category_id" class="chosen-select form-control select21" multiple required style="width:100%">
-                                                <?php foreach ($category as $key => $val) { ?> 
-                                                    <option value="<?= $key ?>" <?= (isset($post_category) && in_array($key,$post_category)) ? 'selected="selected"' : '' ?>><?= $val ?></option> 
-                                                <?php } ?>    
+                                            <select name="category[]" id="sub_category_id" class="form-control select21" multiple required style="width:100%">
+                                                <?php foreach ($category as $key => $val) { ?>
+                                                    <option value="<?= $key ?>" <?= (isset($post_category) && in_array($key, $post_category)) ? 'selected="selected"' : '' ?>><?= $val ?></option>
+                                                <?php } ?>
                                             </select>
                                         </div>
                                     </div>
 
 
                                     <div class="col-lg-4">
-                                        <label for="file_2">Product Image</label>
-                                        <input type="file" class="form-control" name="product_image" id="file_2" />
+                                        <label for="file_2">Template Thumbnail</label>
+                                        <div class="">
+                                            <input type="text"  class="form-control search-query" id="">
+                                        </div>
                                     </div>
 
                                     <div class="col-lg-4 col-sm-4">
@@ -102,41 +108,47 @@ if (isset($product)) {
                                                 <thead>
                                                     <tr>
                                                         <th class="center">
-                                                         Type
+                                                            Type
                                                         </th>
                                                         <th>Frame</th>
                                                         <th>Text</th>
                                                         <th>Font Name</th>
                                                         <th>Font Size</th>
                                                         <th>Text Color</th>
-                                                        <th>Image Name</th>
+                                                        <th>Image ID</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
 
                                                 <tbody>
-                                                    <?php 
+                                                    <?php
                                                     $index = 0;
                                                     ?>
                                                     @if(isset($subview))
                                                     @foreach($subview as $view)
-                                                    <tr id="tr_{{$index}}" >
-        <td class=""><select name="type[]" style="pointer-events: none;"><option value="Image" `+imageView+` >Image</option><option value="Label" `+labelView+` >Label</option></select></td>
-        <td>
-            <input type="hidden" value="{{$view->id}}" name="sub_view_id[]" >
-            <input type="text" value="{{$view->frame}}" name="frame[]" class="subview_input" >
-        </td>
-        <td><input type="text" value="{{$view->text}}" name="text[]" class="subview_input" ></td>
-        <td><input type="text" value="{{$view->font_name}}" name="font_name[]" class="subview_input" ></td>
-        <td><input type="text" value="{{$view->font_size}}" name="font_size[]" class="subview_input" ></td>
-        <td><input type="text" value="{{$view->text_color}}" name="text_color[]" class="subview_input" ></td>
-        <td><input type="text" value="{{$view->image_name}}" name="image_name[]" class="subview_input" ></td>
-        <td><div class="hidden-sm hidden-xs btn-group">
-            <button class="btn btn-xs btn-info" type="button" onclick="openUpdateSubViewPopUp({{$index}});" ><i class="ace-icon fa fa-pencil bigger-120"></i></button>
-            <button class="btn btn-xs btn-danger" type="button" onclick="openDeleteSubViewPopUp({{$index}});" ><i class="ace-icon fa fa-trash-o bigger-120"></i></button>
-        </div></td></tr>
+                                                    <tr id="tr_{{$index}}">
+                                                        <td class=""><select name="type[]" style="pointer-events: none;">
+                                                                <option value="Image" `+imageView+`>Image</option>
+                                                                <option value="Label" `+labelView+`>Label</option>
+                                                            </select></td>
+                                                        <td>
+                                                            <input type="hidden" value="{{$view->id}}" name="sub_view_id[]">
+                                                            <input type="text" value="{{$view->frame}}" name="frame[]" class="subview_input" readonly >
+                                                        </td>
+                                                        <td><input type="text" value="{{$view->text}}" name="text[]" class="subview_input" readonly ></td>
+                                                        <td><input type="text" value="{{$view->font_name}}" name="font_name[]" class="subview_input" readonly ></td>
+                                                        <td><input type="text" value="{{$view->font_size}}" name="font_size[]" class="subview_input" readonly ></td>
+                                                        <td><input type="text" value="{{$view->text_color}}" name="text_color[]" class="subview_input" readonly ></td>
+                                                        <td><input type="text" value="{{$view->image_name}}" name="image_name[]" class="subview_input" readonly ></td>
+                                                        <td>
+                                                            <div class="hidden-sm hidden-xs btn-group">
+                                                                <button class="btn btn-xs btn-info" type="button" onclick="openUpdateSubViewPopUp({{$index}});"><i class="ace-icon fa fa-pencil bigger-120"></i></button>
+                                                                <button class="btn btn-xs btn-danger" type="button" onclick="openDeleteSubViewPopUp({{$index}});"><i class="ace-icon fa fa-trash-o bigger-120"></i></button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
 
-        <?php 
+                                                    <?php
                                                     $index++;
                                                     ?>
                                                     @endforeach
@@ -189,65 +201,67 @@ if (isset($product)) {
 
             <form action="#" method="post" id="subview_form">
                 <input type="hidden" id="save_action">
-                <input type="text" name="subview_id">
-                <div class="modal-header">
-                    <h5 class="modal-title">SubView</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <input type="hidden" name="subview_id">
+                <div class="modal-header" style="height:50px;">
+                    <h3 class="modal-title" style="width: 70%;">SubView</h3>
+                    <button type="button" class="close" style="margin-top:-22px;" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
 
+                        <div class="col-lg-6">
+                            <label for="subview_title"> Type</label>
+                            <div class="">
+                                <select name="type" class="form-control" onclick="selectType(this);">
+                                    <option value="Image">Image</option>
+                                    <option value="Label">Label</option>
+                                </select>
+                            </div>
+                        </div>
 
+                        <div class="col-lg-6 col-sm-6">
+                            <label for="subview_title"> Frame</label>
+                            <div class="">
+                                <input type="text" class="form-control model_input" name="frame">
+                            </div>
+                        </div>
 
-
-
-
-
-
-                    <div class="col-lg-6">
-                        <label for="subview_title"> Type: </label>
-                        <div class="">
-                        <select name="type" class="form-control" >
-                            <option value="Image">Image</option>
-                            <option value="Label">Label</option>
-                        </select>
-                                                </div></div>
-
-                                                <div class="col-lg-6 col-sm-6">
-                        <label for="subview_title"> Frame: </label>
-                        <div class="">
-                        <input type="text" class="form-control" name="frame">
-                        </div></div>
+                        <div class="col-lg-6 col-sm-6">
+                            <label for="subview_title"> Image ID</label>
+                            <div class="">
+                                <input type="text" class="form-control search-query model_input image_input" name="image_name">
+                            </div>
+                        </div>
 
                         <div class="col-lg-6">
-                        <label for="subview_title"> Text: </label>
-                        <div class="">
-                        <input type="text" class="form-control" name="text">
-                        </div></div>
-                    
-                    <div class="col-lg-6 col-sm-6">
-                        <label for="subview_title"> Front Name: </label>
-                        <div class="">
-                        <input type="text" class="form-control" name="font_name">
-                    </div></div>
+                            <label for="subview_title"> Text</label>
+                            <div class="">
+                                <input type="text" class="form-control model_input label_input" name="text">
+                            </div>
+                        </div>
 
-                    <div class="col-lg-6 col-sm-6">
-                        <label for="subview_title"> Font Size: </label>
-                        <div class="">
-                        <input type="text" class="form-control" name="font_size">
-                    </div></div>
-                    <div class="col-lg-6 col-sm-6">
-                        <label for="subview_title"> Text Color: </label>
-                        <div class="">
-                        <input type="text" class="form-control" name="text_color">
-                    </div></div>
-                    <div class="col-lg-6 col-sm-6">
-                        <label for="subview_title"> Image Name: </label>
-                        <div class="">
-                        <input type="text" class="form-control" name="image_name">
-                    </div></div>
+                        <div class="col-lg-6 col-sm-6">
+                            <label for="subview_title"> Front Name</label>
+                            <div class="">
+                                <input type="text" class="form-control model_input label_input" name="font_name">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-sm-6">
+                            <label for="subview_title"> Font Size</label>
+                            <div class="">
+                                <input type="text" class="form-control model_input label_input" name="font_size">
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-6">
+                            <label for="subview_title"> Text Color</label>
+                            <div class="">
+                                <input type="text" class="form-control model_input label_input" name="text_color">
+                            </div>
+                        </div>
+                       
 
 
 
@@ -274,22 +288,37 @@ if (isset($product)) {
 
 
 
-    function openAddSubViewPop(){
-        $('#add_subview').modal('show');
-        $('#save_action').val('save',subviewIndex);
+    function selectType(ele){
+        var type = $(ele).val();
+        if(type == 'Image'){
+            $('.label_input').val('');
+            $('.label_input').attr('readonly',true);
+            $('.image_input').removeAttr('readonly');
+        }else{
+            $('.image_input').val('');
+            $('.image_input').attr('readonly',true);
+            $('.label_input').removeAttr('readonly');
+        }
     }
 
-    function openUpdateSubViewPopUp(index){
+
+
+    function openAddSubViewPop() {
+        $('#add_subview').modal('show');
+        $('#save_action').val('save', subviewIndex);
+    }
+
+    function openUpdateSubViewPopUp(index) {
         $('#save_action').val('update');
         $('#add_subview').modal('show', index);
         let form = $('#subview_form');
-        var row = $('#tr_'+index);
+        var row = $('#tr_' + index);
 
         // $("#gate option[value='Gateway 2']").prop('selected', true);
 
         var typeValue = row.find('[name="type[]"]').val();
         console.log(typeValue);
-        form.find(`[name="type"] option[value='`+typeValue+`']`).prop('selected', true);
+        form.find(`[name="type"] option[value='` + typeValue + `']`).prop('selected', true);
 
         form.find('[name="subview_id"]').val(row.find('[name="subview_id[]"]').val());
         form.find('[name="frame"]').val(row.find('[name="frame[]"]').val());
@@ -301,7 +330,7 @@ if (isset($product)) {
     }
 
 
-    function openDeleteSubViewPopUp(index){
+    function openDeleteSubViewPopUp(index) {
         $.confirm({
             title: 'Confirmation',
             content: 'Do you really want to Remove ?',
@@ -309,7 +338,7 @@ if (isset($product)) {
                 yes: {
                     text: 'Yes',
                     action: function() {
-                        $('#tr_'+index).remove();
+                        $('#tr_' + index).remove();
                     }
                 },
                 no: {
@@ -323,7 +352,7 @@ if (isset($product)) {
     }
 
 
-    function saveSubView(action, index){
+    function saveSubView(action, index) {
         let form = document.querySelector("#subview_form");
         let formdata = new FormData(form);
 
@@ -338,35 +367,36 @@ if (isset($product)) {
         var imageView = '';
         var labelView = '';
 
-        if(type == 'Image'){
+        if (type == 'Image') {
             imageView = 'selected="selected"';
-        }else{
+        } else {
             labelView = 'selected="selected"';
         }
-        var rowString = `<tr id="tr_`+index+`" >
-        <td class=""><select name="type[]" style="pointer-events: none;"><option value="Image" `+imageView+` >Image</option><option value="Label" `+labelView+` >Label</option></select></td>
-        <td><input type="hidden" id="" name="sub_view_id[]" ><input type="text" value="`+frame+`" name="frame[]" class="subview_input" ></td>
-        <td><input type="text" value="`+text+`" name="text[]" class="subview_input" ></td>
-        <td><input type="text" value="`+font_name+`" name="font_name[]" class="subview_input" ></td>
-        <td><input type="text" value="`+font_size+`" name="font_size[]" class="subview_input" ></td>
-        <td><input type="text" value="`+text_color+`" name="text_color[]" class="subview_input" ></td>
-        <td><input type="text" value="`+image_name+`" name="image_name[]" class="subview_input" ></td>
+        var rowString = `<tr id="tr_` + index + `" >
+        <td class=""><select name="type[]" style="pointer-events: none;"><option value="Image" ` + imageView + ` >Image</option><option value="Label" ` + labelView + ` >Label</option></select></td>
+        <td><input type="hidden" id="" name="sub_view_id[]" ><input type="text" value="` + frame + `" name="frame[]" class="subview_input" readonly ></td>
+        <td><input type="text" value="` + text + `" name="text[]" class="subview_input" readonly ></td>
+        <td><input type="text" value="` + font_name + `" name="font_name[]" class="subview_input" readonly ></td>
+        <td><input type="text" value="` + font_size + `" name="font_size[]" class="subview_input" readonly ></td>
+        <td><input type="text" value="` + text_color + `" name="text_color[]" class="subview_input" readonly ></td>
+        <td><input type="text" value="` + image_name + `" name="image_name[]" class="subview_input" readonly ></td>
         <td><div class="hidden-sm hidden-xs btn-group">
-            <button class="btn btn-xs btn-info" onclick="openUpdateSubViewPopUp(`+index+`);" ><i class="ace-icon fa fa-pencil bigger-120"></i></button>
-            <button class="btn btn-xs btn-danger"><i class="ace-icon fa fa-trash-o bigger-120"></i></button>
+            <button class="btn btn-xs btn-info" type="button" onclick="openUpdateSubViewPopUp(` + index + `);" ><i class="ace-icon fa fa-pencil bigger-120"></i></button>
+            <button class="btn btn-xs btn-danger" type="button" ><i class="ace-icon fa fa-trash-o bigger-120"></i></button>
         </div></td></tr>`;
         var action = $('#save_action').val();
-        if(action == 'save'){
+        if (action == 'save') {
             $('#subview-table tbody').append(rowString);
             subviewIndex++;
-        }else{
+        } else {
             console.log(index, rowString);
-            $('#tr_'+index).replaceWith(rowString);
+            $('#tr_' + index).replaceWith(rowString);
         }
         $('#add_subview').modal('hide');
+        $('.model_input').val('');
     }
 
-     
+
 
 
 
@@ -377,53 +407,49 @@ if (isset($product)) {
         let myform = document.getElementById("product_form");
         let fdata = new FormData(myform);
 
-        var errorCount = validator.checkAll();
-        if (errorCount == 0) {
-            $.ajax({
-                data: fdata,
-                cache: false,
-                processData: false,
-                contentType: false,
-                type: 'POST',
-                dataType: "JSON",
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                url: "{{ $actionURL }}",
-                success: function(res, textStatus, jqXHR) {
-                    // console.log('=======>>>>> ',res);
-                    if (jqXHR.status == 200) {
-                        if (typeof res.data.post !== 'undefined') {
-                            $.confirm({
-                                title: 'Success',
-                                content: res.message,
-                                buttons: {
-                                    yes: {
-                                        text: 'OK',
-                                        action: function() {
-                                            window.location = "{{ route('post.logo.create') }}";
-                                        }
+
+        $.ajax({
+            data: fdata,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            dataType: "JSON",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{ $actionURL }}",
+            success: function(res, textStatus, jqXHR) {
+                // console.log('=======>>>>> ',res);
+                if (jqXHR.status == 200) {
+                    if (typeof res.data.post !== 'undefined') {
+                        $.confirm({
+                            title: 'Success',
+                            content: res.message,
+                            buttons: {
+                                yes: {
+                                    text: 'OK',
+                                    action: function() {
+                                        window.location = "{{ route('post.logo.create') }}";
                                     }
                                 }
-                            });
-                        }
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    // console.log(textStatus,jqXHR, errorThrown);
-                    if (jqXHR.status != 200) {
-                        if (typeof jqXHR.responseJSON !== 'undefined') {
-                            $.confirm({
-                                title: 'Error',
-                                content: jqXHR.responseJSON.message
-                            });
-                        }
+                            }
+                        });
                     }
                 }
-            });
-        }
-
-        // console.log(validator.checkAll());
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // console.log(textStatus,jqXHR, errorThrown);
+                if (jqXHR.status != 200) {
+                    if (typeof jqXHR.responseJSON !== 'undefined') {
+                        $.confirm({
+                            title: 'Error',
+                            content: jqXHR.responseJSON.message
+                        });
+                    }
+                }
+            }
+        });
     }
 
 
@@ -487,6 +513,86 @@ if (isset($product)) {
             allow_single_deselect: false
         });
 
+
+        ///////
+        // $('#ajax_select').chosen({allow_single_deselect:true, width:"200px", search_contains: true});
+        //     chosen_ajaxify('ajax_select', '{{route("post.search_image")}}?query=');
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        $.ui.autocomplete.prototype._renderItem = function (ul, item) {
+    if (item.value === '')
+        t = "None found";
+    else
+    {    
+        var searchMask = this.term;
+        var regEx = new RegExp(searchMask, "ig");
+        // var replaceMask = "<span style='font-weight:bold;color:black;'>" + $.trim(this.term) +"</span>";
+        // t = "<span style='font-weight:bold;color:black;'>"+item.title +"</span>";
+        // t += "<img src='"+item.profile_image+"' width='50px' /> "
+
+        t = '<div><img class=""  width="50px" src="'+item.profile_image+'">';
+        t += '<b class="user" >'+item.title+'</b></div>';
+        
+
+        // t += item.label.replace(regEx, replaceMask);
+        //t += " <span style='font-size:50%;'>" + item.age + " years old </span>";
+       //  t += " <span style='color:red;'>" + item.age + "€ </span>";
+    }
+    
+    return $("<li></li>")
+        .data("item.autocomplete", item)
+        .append(t)
+        .appendTo(ul);
+};
+
+$('.search-query').autocomplete({
+    source: function( request, response ) {
+        $.ajax({
+           //  url: "https://api.stackexchange.com/2.2/users?order=desc&sort=reputation&site=stackoverflow",
+           url:'{{route("post.search_image")}}',
+          dataType: "json",
+          data: {
+                query: request.term
+              //filter: request.term,
+              //pagesize: 5
+          },
+          success: function( data ) {
+            //response( data );
+              response($.map(data, function(el, index) {
+                        return {                            
+                            value: el.id,
+                            profile_image: el.img,
+                            title: el.title
+                           // location: el.value
+                        };
+                    }));
+          }
+        });
+      },
+    select: function( event, ui ) {
+        //   $("#result").html("entered="+this.value + "<br/> selected text="+ui.item.label + "<br/>selected value=" + ui.item.value);             
+        // submitSearch(this.id,ui.item.value);          
+      },        
+});
+
+
+$("#search-query").keyup(function (e) {
+    if (e.keyCode == 13) {
+        console.dir(e);
+        submitSearch(e.target.id,$("#search-query").val());
+    }
+});
+
+// function submitSearch(targetId, searchTerm)
+// {        
+//     $("#result2").html("search term="+searchTerm);             
+// }
+
+
+
+        ///////
 
 
     });
