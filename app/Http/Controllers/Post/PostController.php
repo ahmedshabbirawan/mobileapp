@@ -223,7 +223,6 @@ class PostController extends Controller
         $this->viewData['category'] = Term::all()->pluck('name','id');
 
         $thumbnail = Post::find($template->thumbnail_id);
-       //  dd($template->thumbnail_id, $thumbnail, $template);
         $this->viewData['thumbnail'] = (isset($thumbnail->guid))? Util::imageUrl($thumbnail->guid):'';
         $this->viewData['post_category'] = PostTerm::where('post_id',$id)->pluck('term_id')->toArray();
         $this->viewData['subview'] = SubView::where('post_id',$id)->get();

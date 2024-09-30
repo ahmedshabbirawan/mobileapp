@@ -315,7 +315,7 @@ if (isset($product)) {
         }
         var rowString = `<tr id="tr_` + subviewIndex + `" >
         <td class=""><select name="type[]" onchange="selectType(this);" id="select_` + subviewIndex + `"  job_index="` + subviewIndex + `" ><option value="Image" ` + imageView + ` >Image</option><option value="Label" ` + labelView + ` >Label</option></select></td>
-        <td><input type="hidden" id="" name="sub_view_id[]" ><input type="text" value="` + frame + `" name="frame[]" class="subview_input"  ></td>
+        <td><input type="hidden" id="" name="sub_view_id[]" ><input type="text" value="` + frame + `" name="frame[]" class="subview_input" placeholder="x,y,width,height" ></td>
         <td><input type="text" value="` + text + `" name="text[]" class="subview_input label_input"  ></td>
         <td><input type="text" value="` + font_name + `" name="font_name[]" class="subview_input label_input"  ></td>
         <td><input type="text" value="` + font_size + `" name="font_size[]" class="subview_input label_input"  ></td>
