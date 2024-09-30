@@ -113,6 +113,7 @@ class PostController extends Controller
     public function create(){
         // $this->viewData['row'] = [];
         $this->viewData['category'] = Term::all()->pluck('name','id');
+        $this->viewData['postId'] = '';
         return view($this->view.'create',$this->viewData);
     }
 
@@ -226,6 +227,7 @@ class PostController extends Controller
         $this->viewData['thumbnail'] = (isset($thumbnail->guid))? Util::imageUrl($thumbnail->guid):'';
         $this->viewData['post_category'] = PostTerm::where('post_id',$id)->pluck('term_id')->toArray();
         $this->viewData['subview'] = SubView::where('post_id',$id)->get();
+        $this->viewData['postId'] = $id;
         return view($this->view.'edit',$this->viewData);
     }
 

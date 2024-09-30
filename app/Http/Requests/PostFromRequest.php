@@ -39,6 +39,10 @@ class PostFromRequest extends FormRequest
         $rules['frame'] = 'required';
         $rules['template_bounds'] = 'required';
 
+        if(!request()->get('id')){
+            $rules['template_thumbnail_input'] = 'required';
+        }
+        
         return $rules;
     }
 }
