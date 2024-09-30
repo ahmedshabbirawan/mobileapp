@@ -35,6 +35,7 @@ class Post extends Model{ //  implements Auditable{
         'post_parent',
         'guid',
         'menu_order',
+        'thumbnail_id',
         'template_bounds',
         'post_type',
         'post_mime_type',
