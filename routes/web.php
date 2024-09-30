@@ -71,6 +71,11 @@ Route::get('/clear', function () {
 });
 
 
+Route::get('/', function () {
+    return view('site.home');
+});
+
+
 
 Route::get('/login', [AuthController::class, 'loginPageView'])->name('login');
 Route::get('/login-page', [AuthController::class, 'loginPageView'])->name('loginpage');

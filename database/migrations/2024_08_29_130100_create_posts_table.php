@@ -35,6 +35,9 @@ class CreatePostsTable extends Migration
                 $table->unsignedBigInteger('post_parent')->default(0);
                 $table->string('guid', 255)->charset('utf8mb4')->collation('utf8mb4_unicode_520_ci')->default('');
                 $table->integer('menu_order')->default(0);
+                $table->string('template_bound', 200)->nullable();
+                $table->integer('thumbmail_id')->nullable();
+                
                 $table->string('post_type', 20)->charset('utf8mb4')->collation('utf8mb4_unicode_520_ci')->default('post');
                 $table->string('post_mime_type', 100)->charset('utf8mb4')->collation('utf8mb4_unicode_520_ci')->default('');
                 $table->bigInteger('comment_count')->default(0);
