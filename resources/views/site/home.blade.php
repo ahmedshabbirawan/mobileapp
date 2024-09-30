@@ -86,7 +86,7 @@
 </head>
 <body>
     <div class="container">
-        <img src="images/top_logo.png" alt="top logo">
+        <img src="./public/images/top_logo.png" alt="top logo">
         <p>
             <span class="small">Prepare for the future of online logo designing.</span><br>
             <span class="large">Next generation of <b>LOGO</b> making — launching soon!</span>

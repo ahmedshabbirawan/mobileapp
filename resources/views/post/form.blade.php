@@ -521,6 +521,10 @@ if (isset($product)) {
         let fdata = new FormData(myform);
 
 
+
+        $('.widget-box').loading();
+
+
         $.ajax({
             data: fdata,
             cache: false,
@@ -533,6 +537,7 @@ if (isset($product)) {
             },
             url: "{{ $actionURL }}",
             success: function(res, textStatus, jqXHR) {
+                $('.widget-box').loading('stop');
                 // console.log('=======>>>>> ',res);
                 if (jqXHR.status == 200) {
                     if (typeof res.data.post !== 'undefined') {
@@ -552,6 +557,7 @@ if (isset($product)) {
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
+                $('.widget-box').loading('stop');
                 // console.log(textStatus,jqXHR, errorThrown);
                 if (jqXHR.status != 200) {
                     if (typeof jqXHR.responseJSON !== 'undefined') {
