@@ -93,7 +93,7 @@ Route::get('/check-test', [ProductStockController::class, 'checkModelAudit']);
 
 Route::middleware(['web', 'auth'])->group(function () {
 
-    Route::get('/', [DashboardController::class, 'view']);
+    Route::get('/admin', [DashboardController::class, 'view']);
     Route::get('/dashboard', [DashboardController::class, 'view'])->name('dashboard');
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard_stats', [DashboardController::class, 'dashboardStats'])->name('dashboard_stats');
