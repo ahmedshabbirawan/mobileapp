@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Models\AttributeType;
+use App\Models\Post;
 use Illuminate\Support\Facades\Storage;
+
 
 class Util extends Model{
     use HasFactory;	
@@ -43,6 +45,34 @@ class Util extends Model{
             ['key' => 'setting', 'url' => 'javascript:void(0);', 'label' => 'Setting', 'icon' => 'fa fa-cogs', 'childs' => $setting ],
             
         ];
+    }
+
+
+    static function fileUploadToMediaGallery($requestFile){ 
+        try{
+            $fileNameWithExt = $requestFile->getClientOriginalName();
+            $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+            $extension = $requestFile->getClientOriginalExtension();
+            $fileNameToStore = "logo-".'-'.time().'-'.rand(9001,9999).'.'.$extension;
+            $mimeType = $requestFile->getClientMimeType();
+            $path = $requestFile->storeAs('public/post_images', $fileNameToStore);
+            /*
+            $imgFile = Image::fromFile($path);
+            $imgFile->resize(150, 150, Image::EXACT );
+            $imgFile->cropAuto()->save($path);
+            */
+            return Post::create([
+                'post_title' => $filename,
+                'post_author' =>  (auth()->user())? optional(auth()->user())->id:'',
+                'post_status' => 'publish',
+                'post_type' => 'attachment',
+                'guid' => $fileNameToStore,
+                'post_mime_type' => $mimeType
+            ]);
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+    
     }
 
 

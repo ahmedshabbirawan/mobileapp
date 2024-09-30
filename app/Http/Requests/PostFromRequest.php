@@ -34,9 +34,10 @@ class PostFromRequest extends FormRequest
     public function rules(){
         $rules  = [];
         
-        $rules['name']      =  'required';
-        $rules['category']      =  'required';
-        $rules['frame']     =  'required';
+        $rules['name'] = 'required';
+        $rules['category'] = 'required';
+        $rules['frame'] = 'required';
+        $rules['template_bounds'] = 'required';
 
         return $rules;
     }

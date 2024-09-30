@@ -129,25 +129,28 @@ class PostController extends Controller
         $fontNames = $request->get('font_name');
         $fontSizes = $request->get('font_size');
         $textColors = $request->get('text_color');
-        $imageNames = $request->get('image_name');
 
+        $templateBounds = $request->get('template_bounds');
+        $subviewImageFileArr = $request->file('subview_image_file');
+        $postThumbFile =  $request->file('template_thumbnail_input');
         $categories = $request->get('category');
-        
-        if($request->hasFile('product_image')){ 
-            $imageObj = $this->uploadProductImage($request);
-            if(  !($imageObj[0]) ){
-                return response()->json(['message' => $imageObj[1]], 500);
-            }else{
-                $imageName = $imageObj[1];
-            }
+        $media = null;
+
+        if($postThumbFile){
+            $media = $imageObject = Util::fileUploadToMediaGallery($postThumbFile);
         }
+        
+        
         $array = array(
             'post_title' => $name,
             'post_content' => '',
             'post_author' => auth()->user()->id,
             'post_status' => $status,
-            'post_type' => 'logo'
+            'post_type' => 'logo',
+            'thumbnail_id' => (isset($media->id))?$media->id:null,
+            'template_bounds' => $templateBounds
         );
+
         try{
             DB::beginTransaction();
             $product    = Post::create($array);
@@ -161,14 +164,20 @@ class PostController extends Controller
                 $subView['font_name'] =  $fontNames[$index];
                 $subView['font_size'] =  $fontSizes[$index];
                 $subView['text_color'] =  $textColors[$index];
-                $subView['image_name'] =  $imageNames[$index];
+               //  $subView['image_name'] =  $imageNames[$index];
                 $subView['post_id'] = $product->id;
 
-                if($subViewId){
-                    SubView::where('id', $subViewId)->update($subView);
-                }else{
-                    SubView::create($subView);
+                // subview_image_file
+                if(isset($subviewImageFileArr[$index])){
+                    $subViewImage = null;
+                    $imageObject = Util::fileUploadToMediaGallery($subviewImageFileArr[$index]);
+                    if(isset($imageObject->id)){
+                        $subView['image_name'] =  $imageObject->guid; // $imageObject[$index];
+                        $subView['media_id'] =  $imageObject->id;
+                    }
                 }
+                
+                SubView::create($subView);
                 $index++;
             }
 
@@ -185,7 +194,7 @@ class PostController extends Controller
             DB::commit();
 
             if($request->ajax()){
-                return response(['status' => true, 'data' => ['post' => $product], 'message' => 'Product Add successfully.' ]);
+                return response(['status' => true, 'data' => ['post' => $product], 'message' => 'Template created successfully.' ]);
             }else{
                 return redirect(route('product.list'))->with('success',$this->name.' added successful!');
             }
@@ -198,12 +207,7 @@ class PostController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
+
     public function show(Post $post, $id){
         $this->viewData['row'] = Post::find($id);
         $this->viewData['category'] = Term::all()->pluck('name','id');
@@ -213,13 +217,17 @@ class PostController extends Controller
 
 
     public function edit(Post $product,$id){
-        $this->viewData['row'] = Post::find($id);
+        $template = Post::find($id);
+        $this->viewData['row'] = $template;
         $this->viewData['category'] = Term::all()->pluck('name','id');
+
+        $thumbnail = Post::find($template->thumbnail_id);
+       //  dd($template->thumbnail_id, $thumbnail, $template);
+        $this->viewData['thumbnail'] = (isset($thumbnail->guid))? Util::imageUrl($thumbnail->guid):'';
         $this->viewData['post_category'] = PostTerm::where('post_id',$id)->pluck('term_id')->toArray();
         $this->viewData['subview'] = SubView::where('post_id',$id)->get();
         return view($this->view.'edit',$this->viewData);
     }
-
 
     public function update(PostFromRequest $request, Post $product, $id){
         $product = Post::find($id);
@@ -236,9 +244,17 @@ class PostController extends Controller
         $fontNames = $request->get('font_name');
         $fontSizes = $request->get('font_size');
         $textColors = $request->get('text_color');
-        $imageNames = $request->get('image_name');
-
         $categories = $request->get('category');
+
+        $templateBounds = $request->get('template_bounds');
+        $subviewImageFileArr = $request->file('subview_image_file');
+        $postThumbFile =  $request->file('template_thumbnail_input');
+        $categories = $request->get('category');
+        $media = null;
+
+        if($postThumbFile){
+            $media = $imageObject = Util::fileUploadToMediaGallery($postThumbFile);
+        }
 
         $array = array(
             'post_title' => $name,
@@ -247,6 +263,10 @@ class PostController extends Controller
             'post_status' => $status,
             'post_type' => 'logo'
         );
+
+        if( isset($media->id) ){
+            $array['thumbnail_id'] = $media->id;
+        }
 
         try{
             DB::beginTransaction();
@@ -270,8 +290,18 @@ class PostController extends Controller
                 $subView['font_name'] =  $fontNames[$index];
                 $subView['font_size'] =  $fontSizes[$index];
                 $subView['text_color'] =  $textColors[$index];
-                $subView['image_name'] =  $imageNames[$index];
                 $subView['post_id'] = $product->id;
+
+
+                if(isset($subviewImageFileArr[$index])){
+                    $subViewImage = null;
+                    $imageObject = Util::fileUploadToMediaGallery($subviewImageFileArr[$index]);
+                    if(isset($imageObject->id)){
+                        $subView['image_name'] =  $imageObject->guid; // $imageObject[$index];
+                        $subView['media_id'] =  $imageObject->id;
+                    }
+                }
+
 
                 if($subViewId){
                     SubView::where('id', $subViewId)->update($subView);
@@ -322,48 +352,6 @@ class PostController extends Controller
         }
     }
 
-    function uploadProductImage(Request $request){
-        $productName = Str::slug($request->get('name'));
-        if($request->hasFile('product_image')){
-            try{
-                //Getting file name with extension
-                $fileNameWithExt = $request->file('product_image')->getClientOriginalName();
-                //Get just file name
-                // $filename        = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-                //Get just ext
-                $extension       = $request->file('product_image')->getClientOriginalExtension();
-                //Filename to store
-                $fileNameToStore = "product-".$productName.'-'.time().'.'.$extension;
-                //Upload Image
-                $path = $request->file('product_image')->storeAs('public/product_images', $fileNameToStore);
-
-
-                /*******   CREATE TUMBNAIL   *******/
-                
-               //  echo Storage::get($path); exit;
-
-                $path = Storage::path('public/product_images/'.$fileNameToStore);
-
-                // $publicPath = "public\product_images\"".$fileNameToStore;
-
-                $imgFile = Image::fromFile($path);
-                $imgFile->resize(150, 150, Image::EXACT );
-                $imgFile->cropAuto()->save($path);
-                // $imgFile->resize(150, 150, function ($constraint) {
-                //     // $constraint->aspectRatio();
-                //     $constraint->cropAuto();
-                // })->save($path);
-                // $destinationPath = public_path('/uploads');
-                //$image->move($destinationPath, $input['file']);
-                /**************/
-
-                return [true,$fileNameToStore];
-            }catch(Exception $e){
-                return [false,$e->getMessage()];
-            }
-        }
-        return [false,'Image not found!'];
-    }
 
 
     function status($eid){
