@@ -2,7 +2,7 @@
 
 @section('title','Product Details')
 @section('Title','Products')
-@section('URL',route("product.list"))
+@section('URL',route("post.logo.list"))
 @section('PageName','Product Details')
 
 
@@ -20,31 +20,26 @@
 
 
     <div class="row">
-        <div class="col-xs-12 col-sm-12">
+
+    <div class="col-xs-3 col-sm-3">
+
+    <img src="{{ $thumbnail_url }}" width="200" height="200" class="img-thumbnail" onclick="viewImageLargeView(this);" >
+
+    </div>
+
+        <div class="col-xs-9 col-sm-9">
             <h4 class="blue">
-                <span class="middle">{{ $row->name }}</span>
+                <span class="middle">{{ $row->post_title }}</span>
             </h4>
 
             <div class="profile-user-info profile-user-info-striped">
                 <div class="profile-info-row">
-                    <div class="profile-info-name"> Product Title </div>
-                    <div class="profile-info-value"><span>{{ $row->name }}</span></div>
+                    <div class="profile-info-name"> Title </div>
+                    <div class="profile-info-value"><span>{{ $row->post_title }}</span></div>
                 </div>
                 <div class="profile-info-row">
                     <div class="profile-info-name"> Categories </div>
-                    <div class="profile-info-value"><span>{{ $categories['category']['name'] }} / {{ $categories['sub_category']['name'] }} / {{ $categories['product_category']['name'] }}</span></div>
-                </div>
-                <div class="profile-info-row">
-                    <div class="profile-info-name"> Attributes </div>
-                    <div class="profile-info-value"><span><?php 
-                                            foreach($row->product_attribute_value->pluck('value','attribute_type.name') as $key => $value):
-                                                echo $key.' : '.$value.'<br>';
-                                            endforeach;
-                                        ?></span></div>
-                </div>
-                <div class="profile-info-row">
-                    <div class="profile-info-name"> Unit of Measurement </div>
-                    <div class="profile-info-value"><span>{{(isset($row->uom->name))?$row->uom->name:'' }}</span></div>
+                    <div class="profile-info-value"><span>@foreach($categories as $cat) {{ $cat->name }}  @endforeach</span></div>
                 </div>
                 <div class="profile-info-row">
                     <div class="profile-info-name"> Created Date & Time </div>
@@ -58,50 +53,12 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-xs-12">
-            <!-- PAGE CONTENT BEGINS -->
-            <div class="tabbable">
-                <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
-                    <li class="active">
-                        <a data-toggle="tab" href="#deliveries-tab" aria-expanded="false">
-                            <i class="blue ace-icon fa fa-question-circle bigger-120"></i>
-                            Purchases
-                        </a>
-                    </li>
+    
 
-                    <li class=""> 
-                        <a data-toggle="tab" href="#suppliers-tab" aria-expanded="false">
-                            <i class="orange ace-icon fa fa-truck bigger-120"></i>
-                            Suppliers
-                        </a>
-                    </li>
 
-                    <li class="">
-                        <a data-toggle="tab" href="#items-tab" aria-expanded="false">
-                            <i class="purple ace-icon fa fa-magic bigger-120"></i>
-                            Product Items
-                        </a>
-                    </li>
 
-                    <li class="">
-                        <a data-toggle="tab" href="#shop-wise-stock-tab" aria-expanded="false">
-                            <i class="purple ace-icon fa fa-magic bigger-120"></i>
-                            Shop Wise Stock
-                        </a>
-                    </li>
-                </ul>
-                <div class="tab-content no-border padding-24">
-                @include('product.tab.delivery_tab',['product_id' => $row->id])
-                @include('product.tab.suppliers_tab',['product_id' => $row->id])
-                @include('product.tab.items_tab',['product_id' => $row->id])
-                @include('product.tab.shop_wise_available_stock_tab',['product_id' => $row->id])
-                </div>
-            </div>
 
-            <!-- PAGE CONTENT ENDS -->
-        </div><!-- /.col -->
-    </div><!-- /.row -->
+
 </div>
 
 

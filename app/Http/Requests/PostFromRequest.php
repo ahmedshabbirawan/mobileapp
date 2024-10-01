@@ -42,7 +42,35 @@ class PostFromRequest extends FormRequest
         if(!request()->get('id')){
             $rules['template_thumbnail_input'] = 'required';
         }
+
+
+        $types = request()->get('type');
+        $index = 0;
+        foreach($types as $type){
+
+            if($type == 'Image'){
+                $rules['subview_image_file'] = 'required'; 
+            }
+
+            $index++;
+
+        }
+
+
         
         return $rules;
     }
+
+
+
+    public function messages()
+    {
+    return [
+      'name.required' => 'Template Title is required',
+    ];
+    }
+
+
+
+
 }

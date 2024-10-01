@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Media;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Util\Util;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Str;
@@ -58,7 +59,7 @@ class MediaController extends Controller
             $datatable =  Datatables::of($results)
             ->addColumn('image_thumb', function ($row) {
                 $imagePath = self::getFilePath($row->guid);
-                return '<img src="'.$imagePath.'" width="75" height="75" >';
+                return '<img src="'.$imagePath.'" width="75" height="75" onclick="viewImageLargeView(this);" >';
             })->addColumn('user_name', function ($row) {
                 return '';
             })->addColumn('action', function ($row) {
@@ -104,6 +105,7 @@ class MediaController extends Controller
             try{
                 $mediaFiles = [];
                 foreach($files as $file){
+                    /*
                     $imageCount++;
                     $fileNameWithExt = $file->getClientOriginalName();
                     $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
@@ -111,11 +113,11 @@ class MediaController extends Controller
                     $fileNameToStore = "logo-".$imageCount.'-'.time().'.'.$extension;
                     $mimeType = $file->getClientMimeType();
                     $path = $file->storeAs('public/post_images', $fileNameToStore);
-                    /*
-                    $imgFile = Image::fromFile($path);
-                    $imgFile->resize(150, 150, Image::EXACT );
-                    $imgFile->cropAuto()->save($path);
-                    */
+                    
+                    // $imgFile = Image::fromFile($path);
+                    // $imgFile->resize(150, 150, Image::EXACT );
+                    // $imgFile->cropAuto()->save($path);
+                    
                     Post::create([
                         'post_title' => $filename,
                         'post_author' =>  (auth()->user())? optional(auth()->user())->id:'',
@@ -124,7 +126,15 @@ class MediaController extends Controller
                         'guid' => $fileNameToStore,
                         'post_mime_type' => $mimeType
                     ]);
-                    $mediaFiles[] = ['file_url' => self::getFilePath($fileNameToStore),'post_title' => $filename];
+                    */
+
+                    $media = Util::fileUploadToMediaGallery($file);
+
+                    if(isset($media->id)){
+                        $mediaFiles[] = ['file_url' => self::getFilePath($media->guid),'post_title' => $media->guid];
+                    }
+
+                    
                 }
                 return response()->json(['data' => $mediaFiles, 'message' => count($mediaFiles).' files uploaded successfully.' ]);
             }catch(\Exception $e){

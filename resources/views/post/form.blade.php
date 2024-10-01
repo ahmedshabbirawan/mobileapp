@@ -167,7 +167,7 @@ if (isset($product)) {
                                     </select></td>
                                 <td>
                                     <input type="hidden" value="{{$view->id}}" name="sub_view_id[]">
-                                    <input type="text" value="{{$view->frame}}" name="frame[]" class="subview_input" >
+                                    <input type="text" value="{{$view->frame}}" name="frame[]" placeholder="x,y,width,height" class="subview_input" >
                                 </td>
                                 <td><input type="text" value="{{$view->text}}" name="text[]" class="subview_input label_input" <?=($view->type == 'Image')?'readonly"':'' ?> ></td>
                                 <td><input type="text" value="{{$view->font_name}}" name="font_name[]" class="subview_input label_input" <?=($view->type == 'Image')?'readonly"':'' ?> ></td>
@@ -175,9 +175,9 @@ if (isset($product)) {
                                 <td><input type="text" value="{{$view->text_color}}" name="text_color[]" class="subview_input label_input" <?=($view->type == 'Image')?'readonly"':'' ?> ></td>
                                 <td>
                                 
-                                    <div class="col-lg-6 col-sm-6">
-                                        <label for="file-upload_{{ $index }}" class="custom-file-upload btn-xs btn-info"  style="text-align: center;">Change</label>
-                                        <input name="subview_image_file[]" id="file-upload_{{ $index }}" class="subview_file_input image_input"   type="file" onchange="imageFileChange(this);" />
+                                    <div class="col-lg-6 col-sm-6 image_div" id="image_div_<?=$index?>" >
+                                        <label for="file-upload_{{ $index }}" class="custom-file-upload btn-xs btn-info image_input"  style="text-align: center;">Change</label>
+                                        <input name="subview_image_file[]" id="file-upload_{{ $index }}" class="subview_file_input image_input"   type="file" onchange="imageFileChange(this);" accept="image/*" />
                                     </div>
                                         <div class="col-lg-6 col-sm-6"><img src="{{ ($view->image_name)? App\Util\Util::imageUrl($view->image_name) :  $imagePlaceholder}}" width="50" height="50" ></div>
                             
@@ -238,10 +238,16 @@ if (isset($product)) {
             $('#tr_'+jobId).find('.label_input').val('');
             $('#tr_'+jobId).find('.label_input').attr('readonly', true);
             $('#tr_'+jobId).find('.image_input').removeAttr('readonly');
+
+            $('#tr_'+jobId).find('.image_div').removeAttr('disabled');
+            
+
         } else {
             $('#tr_'+jobId).find('.image_input').val('');
             $('#tr_'+jobId).find('.image_input').attr('readonly', true);
             $('#tr_'+jobId).find('.label_input').removeAttr('readonly');
+
+            $('#tr_'+jobId).find('.image_div').attr('disabled',true);
         }
     }
 
@@ -321,8 +327,8 @@ if (isset($product)) {
         <td><input type="text" value="` + font_size + `" name="font_size[]" class="subview_input label_input"  ></td>
         <td><input type="text" value="` + text_color + `" name="text_color[]" class="subview_input label_input"  ></td>
         <td>
-                <div class="col-lg-6 col-sm-6"><label for="file-upload_`+subviewIndex+`" class="custom-file-upload btn-xs btn-info" style="text-align: center;">Change</label>
-                <input name="subview_image_file[]" id="file-upload_`+subviewIndex+`" class="subview_file_input image_input" type="file" onchange="imageFileChange(this);" /></div>
+                <div class="col-lg-6 col-sm-6 image_div" id="image_div_` + subviewIndex + `" ><label for="file-upload_`+subviewIndex+`" class="custom-file-upload btn-xs btn-info image_input" style="text-align: center;">Change</label>
+                <input name="subview_image_file[]" id="file-upload_`+subviewIndex+`" class="subview_file_input image_input" type="file" onchange="imageFileChange(this);" accept="image/*" /></div>
                 <div class="col-lg-6 col-sm-6"><img src="{{$imagePlaceholder}}" id="img_file-upload_`+subviewIndex+`" width="50" height="50" ></div>
         </td>
         <td><div class="hidden-sm hidden-xs btn-group">
@@ -335,6 +341,14 @@ if (isset($product)) {
                 selectType($('#select_' + subviewIndex));
                 subviewIndex++;
             },1000);
+
+
+            $('input[type=file]').click(function(e){
+            var attr = $(this).attr('readonly');
+            if (typeof attr !== 'undefined' && attr !== false) {
+                e.preventDefault();
+            }
+        });
          
 
     }

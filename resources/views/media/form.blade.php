@@ -1,6 +1,4 @@
 <meta name="csrf-token" content="{{ csrf_token() }}" />
-
-
 <?php
 $subCategoryID      = '';
 $name = '';
@@ -32,30 +30,13 @@ if (isset($product)) {
                                 <h4 class="widget-title">{{ isset($product) ? 'Update' : 'Create' }}</h4>
                             </div>
                             <div class="widget-body">
-
                                 <div class="widget-main">
-
-
-
-
-
-                                    
-<p id="msg-div"></p>
-
-
-
-
-                                   
+                                    <p id="msg-div"></p>
                                     <div class="col-lg-4">
                                         <label style="font-size:11px;">Product Image</label>
                                         <input type="file" name="post_files[]" multiple id="file_2" />
                                     </div>
-                                   
-
-
                                     <div class="space-4"></div>
-
-
                                     <div style="clear:both;"></div>
                                 </div>
                             </div>
@@ -130,7 +111,7 @@ if (isset($product)) {
                                     yes: {
                                         text: 'OK',
                                         action: function() {
-                                            window.location = "{{ route('post.logo.create') }}";
+                                            window.location = "{{ route('media.create') }}";
                                         }
                                     }
                                 }

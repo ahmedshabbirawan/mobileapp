@@ -209,6 +209,33 @@ tag-basic-style.css -->
 
 
 
+
+
+<!--- image view modal --->
+<div class="modal" tabindex="-1" role="dialog" id="imageViewModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content ">
+
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Image View</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                   <div class="row"> <div class="col-lg-12"> <img src="" class="thumbnail" id="image_view" alt="image view" ></div></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+
+
+        </div>
+    </div>
+</div>
+<!--- image view modal end --->
+
 	<style>
 	/* Default jquery-loading styles */
 
@@ -237,6 +264,24 @@ tag-basic-style.css -->
   color: #fff;
 }
 
+
+.full_modal-dialog {
+  width: 98% !important;
+  height: 92% !important;
+  min-width: 98% !important;
+  min-height: 92% !important;
+  max-width: 98% !important;
+  max-height: 92% !important;
+  padding: 0 !important;
+}
+
+.full_modal-content {
+  height: 99% !important;
+  min-height: 99% !important;
+  max-height: 99% !important;
+}
+
+
 </style>
 
 
@@ -264,7 +309,20 @@ tag-basic-style.css -->
 });
 $(document).ready(function(){
 	// pos_app.showAddProductModal();
+
+	
+
+
 });
+
+
+function viewImageLargeView(ele){
+		var imageSrc = $(ele).attr('src');
+		$('#image_view').attr('src',imageSrc);
+
+		$('#imageViewModal').modal('show');
+
+	}
 
 
 	</script>

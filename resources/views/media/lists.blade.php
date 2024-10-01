@@ -168,10 +168,15 @@ Media Gallery
                     name: 'post_title',
                     title: 'Title'
                 },
+                // {
+                //     data: 'user_name',
+                //     name: 'user_name',
+                //     title: 'Author'
+                // },
                 {
-                    data: 'user_name',
-                    name: 'user_name',
-                    title: 'Author'
+                    data: 'created_at',
+                    name: 'created_at',
+                    title: 'Create Time'
                 },
                 {
                     data: 'status_label',

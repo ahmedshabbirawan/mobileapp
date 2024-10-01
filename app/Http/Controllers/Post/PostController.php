@@ -72,7 +72,12 @@ class PostController extends Controller
             $column     = explode('-',$order)[0];
             $sort       = explode('-',$order)[1];
 
-            $results = Post::with(['user' => function($query) use ($request){}]
+            $results = Post::with([
+                'user' => function($query) use ($request){}, 
+                'postTerm' => function($query) use ($request){
+                    
+                }
+            ]
             )->select()->where(function ($query) use ($request) {
                 $query->where('post_type','logo');
 
@@ -80,10 +85,17 @@ class PostController extends Controller
             
             
             $datatable =  Datatables::of($results)
-            ->addColumn('attributes_tags', function ($row) {
-                return '';
+            ->addColumn('categories', function ($row) {
+                $categories = [];
+                foreach($row->postTerm as $category){
+                    $categories[] = '<a href="javascript:void(0);">'.$category->name.'</a>';
+                }
+                return implode(', ',$categories);
             })->addColumn('user_name', function ($row) {
                 return '';
+            })->addColumn('thumbnail_url', function ($row) {
+                $thumb = Post::find($row->thumbnail_id);
+                return (isset($thumb->guid)) ? Util::imageUrl($thumb->guid) : '';
             })->addColumn('action', function ($row) {
                //  return $row;
                     $statusIcon = 'fa fa-ban';
@@ -97,7 +109,7 @@ class PostController extends Controller
                     //  $action .= '<a href="javascript:void(0);" onclick="deleteConfirmation('.$row->id.');" class="btn btn-xs btn-danger" data-toggle="tooltip" title="Delete" ><i class="ace-icon fa fa-trash-o bigger-120"></i></a>';
                      $action .= '</div>';
                     return $action;
-            })->rawColumns(['status_label','action']);
+            })->rawColumns(['status_label','categories','action']);
 
          
 
@@ -210,9 +222,13 @@ class PostController extends Controller
 
 
     public function show(Post $post, $id){
-        $this->viewData['row'] = Post::find($id);
-        $this->viewData['category'] = Term::all()->pluck('name','id');
-        $this->viewData['subview'] = SubView::where('post',$id)->get();
+        $post = Post::with('postTerm')->find($id);
+        $thumb = Post::find($post->thumbnail_id);
+        
+        $this->viewData['thumbnail_url'] = (isset($thumb->guid)) ? Util::imageUrl($thumb->guid) : '';
+        $this->viewData['row'] = $post;
+        $this->viewData['categories'] = $post->postTerm;  //Term::all()->pluck('name','id');
+        $this->viewData['subview'] = SubView::where('post_id',$id)->get();
         return view($this->view.'detail_new',$this->viewData);
     }
 

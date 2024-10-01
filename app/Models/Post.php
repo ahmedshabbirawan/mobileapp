@@ -45,6 +45,19 @@ class Post extends Model{ //  implements Auditable{
 
     protected $appends = ['status_label'];
 
+
+
+    public function postTerm()
+    {
+        return $this->belongsToMany(Term::class,'post_terms');
+    }
+
+
+    public function getCreatedAtAttribute($value)
+    {
+        return \Carbon\Carbon::parse($value)->format('d-m-Y H:i:s'); // Customize the format as needed
+    }
+
     
 
 

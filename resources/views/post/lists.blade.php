@@ -159,15 +159,28 @@ Templates
                    
                 },
                 {
+                    data: 'thumbnail_url',
+                    name: 'thumbnail_url',
+                    title: 'Thumbnail',
+                    render: function (data, type, row, meta) {
+                        return '<img src="' + data + '" width="75" height="75" onclick="viewImageLargeView(this);" >';
+                    }
+                },
+                {
                     data: 'post_title',
                     name: 'post_title',
                     title: 'Title'
                 },
                 {
-                    data: 'user_name',
-                    name: 'user_name',
-                    title: 'Author'
+                    data: 'categories',
+                    name: 'categories',
+                    title: 'Category'
                 },
+                // {
+                //     data: 'user_name',
+                //     name: 'user_name',
+                //     title: 'Author'
+                // },
                 {
                     data: 'status_label',
                     name: 'status',
