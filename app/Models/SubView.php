@@ -10,7 +10,7 @@ class SubView extends Model
     use HasFactory;
 
     protected $fillable = ['post_id', 'type','frame', 'text','font_name','font_size','text_color','image_name','media_id','extra','updated_by','deleted_by','deleted_at','created_at','updated_at'];   
-    protected $appends = ['status_label'];
+   //  protected $appends = ['status_label'];
 
 
 }

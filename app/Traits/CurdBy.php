@@ -13,7 +13,7 @@ use Attribute;
         parent::boot();
 
         static::creating(function (&$model) {
-            $model->created_by = auth()->user()->id;
+            $model->created_by = (auth()->user())? auth()->user()->id:'';
         });
 
         static::updating(function (&$model) {

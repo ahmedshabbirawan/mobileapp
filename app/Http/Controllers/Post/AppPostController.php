@@ -6,6 +6,12 @@ use App\Http\Requests\PostFromRequest;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\PostResource;
+
+use App\Models\PostTerm;
+use App\Models\SubView;
+use App\Models\Term;
+use App\Util\Util;
 
 class AppPostController extends Controller
 {
@@ -34,19 +40,30 @@ class AppPostController extends Controller
         $column     = explode('-',$order)[0];
         $sort       = explode('-',$order)[1];
 
-        $results = Post::with(['user' => function($query) use ($request){}]
+        $results = Post::with([
+            // 'user' => function($query) use ($request){}, 
+            'postTerm',
+            'subView'
+        ]
         )->select()->where(function ($query) use ($request) {
             $query->where('post_type','logo')->where('post_status','publish');
         })->orderByRaw($column.' '.$sort)->get();
 
-        return response()->json([
-            'data' => $results
-        ]);
+        return PostResource::collection($results);
+
+        // return response()->json([
+        //     'data' => $results
+        // ]);
     }
 
    
 
     public function store(PostFromRequest $request){
+
+        return app(PostController::class)->store($request);
+
+
+
         $name           = $request->get('post_title');
         $description    = $request->get('post_content');
         $status         = $request->get('post_status');
@@ -77,12 +94,27 @@ class AppPostController extends Controller
     }
 
 
-    public function show(Post $product, $id){
-        $post = Post::find($id);
-        if($post){
-            return response()->json(['data' => $post, 'message' => 'Done' ]);
-        }
-        return response()->json(['status' => false, 'data' => array(), 'message' => 'Logo not found!' ],404);
+    public function show(Post $post, $id){
+        $post = Post::with([
+            'postTerm',
+            'subView'
+        ])->findOrFail($id);
+
+       //  dd($post);
+
+        // $thumb = Post::find($post->thumbnail_id);
+
+
+        return new PostResource($post);
+
+        
+        // $this->viewData['thumbnail_url'] = (isset($thumb->guid)) ? Util::imageUrl($thumb->guid) : '';
+        // $this->viewData['row'] = $post;
+        // $this->viewData['categories'] = $post->postTerm;
+        // $this->viewData['subview'] = SubView::where('post_id',$id)->get();
+
+
+        // return response()->json(['status' => true, 'data' => $this->viewData, 'message' => 'OK' ],200);
     }
 
 

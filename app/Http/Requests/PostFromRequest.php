@@ -39,6 +39,8 @@ class PostFromRequest extends FormRequest
         $rules['frame'] = 'required';
         $rules['template_bounds'] = 'required';
 
+        $rules['type'] = 'required';
+
         if(!request()->get('id')){
             $rules['template_thumbnail_input'] = 'required';
         }
@@ -46,15 +48,15 @@ class PostFromRequest extends FormRequest
 
         $types = request()->get('type');
         $index = 0;
-        foreach($types as $type){
-
-            if($type == 'Image'){
-                $rules['subview_image_file'] = 'required'; 
+        if(is_array($types) && count($types) > 0){
+            foreach($types as $type){
+                if($type == 'Image'){
+                    $rules['subview_image_file'] = 'required'; 
+                }
+                $index++;
             }
-
-            $index++;
-
         }
+        
 
 
         

@@ -52,6 +52,11 @@ class Post extends Model{ //  implements Auditable{
         return $this->belongsToMany(Term::class,'post_terms');
     }
 
+    public function subView()
+    {
+        return $this->hasMany(SubView::class);
+    }
+
 
     public function getCreatedAtAttribute($value)
     {
@@ -65,7 +70,7 @@ class Post extends Model{ //  implements Auditable{
         parent::boot();
       //   self::curdBy();
     }
-    public function getStatusLabelAttribute($value){
+    protected function getStatusLabelAttribute($value){
         return self::statusLabel($this->status);
     }
 

@@ -25,6 +25,24 @@ Templates
 
         <div class="card radius-10 border-top border-0 border-4 border-danger">
 
+        <div class="card-header">
+            <div class="row">
+            <form action="#" id="search-form">
+            <div class="col-lg-6 col-sm-6">
+                <label class="" for="form-field-1"> Category</label>
+                <div>
+                    <select name="category[]" id="category_id" class="form-control select21" onchange="applyFilter();"  style="width:100%">
+                            <option value=""> All </option>
+                        <?php foreach ($category as $key => $val) { ?>
+                            <option value="<?= $key ?>" <?= (isset($post_category) && in_array($key, $post_category)) ? 'selected="selected"' : '' ?>><?= $val ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+            </div>
+            </form>
+            </div>
+            <div class="space-4"></div>
+        </div>
 
             <div class="card-body">
 
@@ -147,10 +165,18 @@ Templates
     }
 
     $(document).ready(function() {
+
+        // var categoryId = $('#category_id').val();
+
         table = $('#yajra-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('post.logo.list') }}",
+            ajax: {
+                url : "{{ route('post.logo.list') }}",
+                data : function(q){
+                q.category_id = $('#category_id').val();
+            },
+            },
             columns: [
                 {
                     data: 'id',
@@ -187,6 +213,11 @@ Templates
                     title: 'Status'
                 },
                 {
+                    data: 'created_at',
+                    name: 'created_at',
+                    title: 'Created At'
+                },
+                {
                     data: 'action',
                     name: 'action',
                     title: 'Action'
@@ -194,6 +225,15 @@ Templates
             ],
             // order: [[1, 'asc']]
         });
+
+
+        
+
+
     });
+
+    function applyFilter(){
+            $('#yajra-table').DataTable().ajax.reload();
+        }
 </script>
 @endsection

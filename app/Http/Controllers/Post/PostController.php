@@ -11,15 +11,8 @@ use App\Models\SubView;
 use App\Models\Term;
 use App\Util\Util;
 use Illuminate\Http\Request;
-
-
-use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
-
-use Exception;
 use Illuminate\Support\Facades\DB;
-use Nette\Utils\Image;
-use Illuminate\Support\Facades\Storage;
 
 
 
@@ -43,42 +36,30 @@ class PostController extends Controller
         $this->view         = 'post.';
     }
 
-
-    function searchImage(Request $request){
-        $query = $request->get('query');
-
-        $medias = Post::where('post_type','attachment')
-        // ->whereLike('name', '%'.$query.'%')
-        ->limit(15)->get();
-        $mediaArr = array();
-        foreach($medias as $media){
-            $mediaArr[] = [
-                'id' => $media->id,
-                'title' => $media->post_title,
-                'img' => Util::imageUrl($media->guid)
-            ];
-        }
-        return $mediaArr;
-    }
-
-
- 
     public function index(Request $request){
-
-
         if($request->ajax()){
-
             $order      = $request->get('order_by','id-desc');
             $column     = explode('-',$order)[0];
             $sort       = explode('-',$order)[1];
-
+            $categoryId = $request->get('category_id');
             $results = Post::with([
                 'user' => function($query) use ($request){}, 
-                'postTerm' => function($query) use ($request){
-                    
+                'postTerm' => function($query) use ($request, $categoryId){
                 }
             ]
-            )->select()->where(function ($query) use ($request) {
+            )->select()
+            ->whereHas('postTerm',function($query) use ($request, $categoryId){
+                if($categoryId){
+                  //   dd('*',$categoryId);
+                    $query->where('term_id', $categoryId);                    // if($categoryId){
+                        //   //   dd('*',$categoryId);
+                        //     $query->where('term_id', $categoryId);
+                        // }
+                        
+                }
+                
+            })
+            ->where(function ($query) use ($request) {
                 $query->where('post_type','logo');
 
             })->orderByRaw($column.' '.$sort)->get();
@@ -117,13 +98,11 @@ class PostController extends Controller
             return $datatable->make(true);
     }
 
-
-      //   $this->viewData['shops']        = $shops;
+        $this->viewData['category'] = Term::all()->pluck('name','id');
         return view($this->view.'lists',$this->viewData);
     }
 
     public function create(){
-        // $this->viewData['row'] = [];
         $this->viewData['category'] = Term::all()->pluck('name','id');
         $this->viewData['postId'] = '';
         return view($this->view.'create',$this->viewData);
@@ -131,9 +110,7 @@ class PostController extends Controller
 
     public function store(PostFromRequest $request){
         $name           = $request->get('name');
-        $description    = $request->get('description');
-        $status         = $request->get('status');
-        $imageName      = null;
+        $status         = $request->get('status','publish');
 
         $subViewIds = $request->get('sub_view_id');
         $types = $request->get('type');
@@ -157,7 +134,7 @@ class PostController extends Controller
         $array = array(
             'post_title' => $name,
             'post_content' => '',
-            'post_author' => auth()->user()->id,
+            'post_author' => (auth()->user())? auth()->user()->id:0,
             'post_status' => $status,
             'post_type' => 'logo',
             'thumbnail_id' => (isset($media->id))?$media->id:null,
@@ -169,7 +146,7 @@ class PostController extends Controller
             $product    = Post::create($array);
             $index = 0;
             foreach($types as $type){
-                $subViewId = $subViewIds[$index];
+               //  $subViewId = $subViewIds[$index];
 
                 $subView['type'] =  $type;
                 $subView['frame'] =  $frames[$index];
@@ -177,15 +154,15 @@ class PostController extends Controller
                 $subView['font_name'] =  $fontNames[$index];
                 $subView['font_size'] =  $fontSizes[$index];
                 $subView['text_color'] =  $textColors[$index];
-               //  $subView['image_name'] =  $imageNames[$index];
                 $subView['post_id'] = $product->id;
+                $subView['post_status'] = 'publish';
 
                 // subview_image_file
                 if(isset($subviewImageFileArr[$index])){
                     $subViewImage = null;
                     $imageObject = Util::fileUploadToMediaGallery($subviewImageFileArr[$index]);
                     if(isset($imageObject->id)){
-                        $subView['image_name'] =  $imageObject->guid; // $imageObject[$index];
+                        $subView['image_name'] =  $imageObject->guid;
                         $subView['media_id'] =  $imageObject->id;
                     }
                 }
@@ -206,6 +183,9 @@ class PostController extends Controller
 
             DB::commit();
 
+
+            return response(['status' => true, 'data' => ['post' => $product], 'message' => 'Template created successfully.' ]);
+
             if($request->ajax()){
                 return response(['status' => true, 'data' => ['post' => $product], 'message' => 'Template created successfully.' ]);
             }else{
@@ -214,9 +194,9 @@ class PostController extends Controller
             
             
         }catch(\Exception $e){
+            dd($e);
             DB::rollBack();
-            return response()->json(['message' => $e->getLine() .' : Error : Please Contact Support'. $e->getMessage()], 500);
-            // return redirect()->route('category.sub.list')->with('error','Error.Please Contact   Support');
+            return response()->json(['message' => $e->fileName() .' - '.$e->getLine() .' : Error : Please Contact Support'. $e->getMessage()], 500);
         }
     }
 
@@ -227,7 +207,7 @@ class PostController extends Controller
         
         $this->viewData['thumbnail_url'] = (isset($thumb->guid)) ? Util::imageUrl($thumb->guid) : '';
         $this->viewData['row'] = $post;
-        $this->viewData['categories'] = $post->postTerm;  //Term::all()->pluck('name','id');
+        $this->viewData['categories'] = $post->postTerm;
         $this->viewData['subview'] = SubView::where('post_id',$id)->get();
         return view($this->view.'detail_new',$this->viewData);
     }
@@ -249,9 +229,7 @@ class PostController extends Controller
     public function update(PostFromRequest $request, Post $product, $id){
         $product = Post::find($id);
         $name           = $request->get('name');
-        $description    = $request->get('description');
         $status         = $request->get('status');
-        $imageName      = null;
         $postSubView    = SubView::where('post_id',$id)->pluck('id')->toArray();
 
         $subViewIds = $request->get('sub_view_id');
@@ -278,7 +256,8 @@ class PostController extends Controller
             'post_content' => '',
             'post_author' => auth()->user()->id,
             'post_status' => $status,
-            'post_type' => 'logo'
+            'post_type' => 'logo',
+            'template_bounds' => $templateBounds
         );
 
         if( isset($media->id) ){
@@ -294,8 +273,6 @@ class PostController extends Controller
                     SubView::where(['post_id' => $id, 'id' => $postSubviewId])->delete();
                 }
             }
-            
-          //  dd($subViewIds);
 
             $index = 0;
             foreach($types as $type){
@@ -314,7 +291,7 @@ class PostController extends Controller
                     $subViewImage = null;
                     $imageObject = Util::fileUploadToMediaGallery($subviewImageFileArr[$index]);
                     if(isset($imageObject->id)){
-                        $subView['image_name'] =  $imageObject->guid; // $imageObject[$index];
+                        $subView['image_name'] =  $imageObject->guid;
                         $subView['media_id'] =  $imageObject->id;
                     }
                 }
@@ -348,25 +325,12 @@ class PostController extends Controller
         }catch(\Exception $e){
             DB::rollBack();
             return response()->json(['message' => $e->getLine() .' : Error : Please Contact Support'. $e->getMessage()], 500);
-            // return redirect()->route('category.sub.list')->with('error','Error.Please Contact   Support');
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id,Product $product){
-        dd('destory stop');
-        $res = StockItem::where('product_id', $id)->get();
-        if( count($res) > 0){
-            return redirect(route('product.list'))->with('error','This product have stock item. First delete them');
-        }else{
-            Product::find($id)->delete();
-            return redirect(route('product.list'))->with('success','Product updated successful!');
-        }
+ 
+    public function destroy($id,Post $post){
+        Post::find($id)->delete();
     }
 
 
@@ -421,20 +385,9 @@ class PostController extends Controller
                     'image_name' => $data[10]
                 ];
             }
-
-            // dd(templateArr);
-
             if($action == 'insert'){
-
-
                 try{
-
-
                 foreach($templateArr as $template){
-
-
-                  
-
                     $post = Post::create([
                         'post_type' => 'logo',
                         'post_title' => $template['name'],
@@ -451,29 +404,7 @@ class PostController extends Controller
                             'term_id' => $categoryId
                         ]);
                     }
-
                     foreach($template['sub_views'] as  $subView){
-
-
-                    //     dd([
-                    //         'post_type' => 'logo',
-                    //         'post_title' => $template['name'],
-                    //         'post_content' => '', // json_encode($template),
-                    //         'post_author' => 1
-                    //     ],
-                    //     [
-                    //        //  'post_id' => $post->id,
-                    //         'type' => $subView['type'],
-                    //         'frame' => $subView['frame'],
-                    //         'text' => $subView['text'],
-                    //         'font_name' => $subView['font_name'],
-                    //         'font_size' => $subView['font_size'],
-                    //         'font_color' => $subView['font_color'],
-                    //         'image_name' => $subView['image_name'],
-                    //     ]
-                    // );
-
-                     //   dd($subView);
                         SubView::create([
                             'post_id' => $post->id,
                             'type' => $subView['type'],
@@ -485,17 +416,10 @@ class PostController extends Controller
                             'image_name' => $subView['image_name'],
                         ]); 
                     }
-
-                
-
-
                 }
-
             }catch(\Exception $e){
                 return response()->json(['message' => $e->getLine() .' : Error : Please Contact Support'. $e->getMessage()], 500);
-                // return redirect()->route('category.sub.list')->with('error','Error.Please Contact   Support');
             }
-
                 $view = '<p>Insert successfully!</p>';                
             }else{
                 $view = json_encode($templateArr);
@@ -523,6 +447,23 @@ class PostController extends Controller
             ]);
             return $term->name;
         }
+    }
+
+    function searchImage(Request $request){
+        $query = $request->get('query');
+
+        $medias = Post::where('post_type','attachment')
+        // ->whereLike('name', '%'.$query.'%')
+        ->limit(15)->get();
+        $mediaArr = array();
+        foreach($medias as $media){
+            $mediaArr[] = [
+                'id' => $media->id,
+                'title' => $media->post_title,
+                'img' => Util::imageUrl($media->guid)
+            ];
+        }
+        return $mediaArr;
     }
 
 
