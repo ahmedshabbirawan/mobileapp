@@ -50,12 +50,7 @@ class PostController extends Controller
             )->select()
             ->whereHas('postTerm',function($query) use ($request, $categoryId){
                 if($categoryId){
-                  //   dd('*',$categoryId);
-                    $query->where('term_id', $categoryId);                    // if($categoryId){
-                        //   //   dd('*',$categoryId);
-                        //     $query->where('term_id', $categoryId);
-                        // }
-                        
+                    $query->where('term_id', $categoryId);
                 }
                 
             })
@@ -330,6 +325,7 @@ class PostController extends Controller
 
  
     public function destroy($id,Post $post){
+        return ['Stop'];
         Post::find($id)->delete();
     }
 
@@ -367,22 +363,39 @@ class PostController extends Controller
                 $index++;
                 $data = str_getcsv($line);
 
+                $templateThumbnail = $data[4];
+                $subViewImageName = $data[11];
+                
+                $thumbnailId = Post::getMediaIdByFileName($templateThumbnail);
+                $thumbnailId = ($thumbnailId)?$thumbnailId->id:'';
+               //  dd($thumbnailId);
+                
+
+
+
+                $subViewImage = Post::getMediaIdByFileName($subViewImageName);
+                $mediaId = ($subViewImage)?$subViewImage->id:'';
+
+
+
                 if(!isset($templateArr[$data[0]])){
                     $templateArr[$data[0]] = [
                         'id' => $data[0],
                         'name' => $data[1],
                         'categories' => $data[2],
                         'bounds' => $data[3],
+                        'thumbnail_id' => $thumbnailId
                     ];
                 }
                 $templateArr[$data[0]]['sub_views'][] = [
-                    'type' => $data[4],
-                    'frame' => $data[5],
-                    'text' => $data[6],
-                    'font_name' => $data[7],
-                    'font_size' => $data[8],
-                    'font_color' => $data[9],
-                    'image_name' => $data[10]
+                    'type' => $data[5],
+                    'frame' => $data[6],
+                    'text' => $data[7],
+                    'font_name' => $data[8],
+                    'font_size' => $data[9],
+                    'font_color' => $data[10],
+                    'image_name' => $data[11],
+                    'media_id' => $mediaId
                 ];
             }
             if($action == 'insert'){
@@ -392,7 +405,10 @@ class PostController extends Controller
                         'post_type' => 'logo',
                         'post_title' => $template['name'],
                         'post_content' => '',//json_encode($template),
-                        'post_author' => 1
+                        'post_author' => 1,
+                        'template_bounds' => $template['bounds'],
+                        'thumbnail_id' => $template['thumbnail_id']
+
                     ]);
 
                     $categories = explode(',',$template['categories']);

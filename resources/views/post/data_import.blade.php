@@ -30,7 +30,7 @@
                                     <div style="clear:both;"></div>
                                     <div class="col-lg-4">
                                         <label style="font-size:11px;">File</label>
-                                        <input type="file" name="product_image" id="file_2" />
+                                        <input type="file" name="product_image" id="data_import_file"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
                                     </div>
                                     
 
@@ -53,14 +53,6 @@
                                             <i class="ace-icon fa fa-check bigger-110"></i>
                                             Upload
                                         </button>
-
-
-
-                                       
-                                        <!-- <button class="btn" type="reset">
-                                            <i class="ace-icon fa fa-undo bigger-110"></i>
-                                            Reset
-                                        </button> -->
                                     </div>
                                 </div>
                             </div>
@@ -148,14 +140,14 @@
 
     $(document).ready(function() {
 
-        $('#file_2').ace_file_input({
+        $('#data_import_file').ace_file_input({
             no_file: 'No File ...',
             btn_choose: 'Choose',
             btn_change: 'Change',
             droppable: false,
             onchange: null,
-            thumbnail: false //| true | large
-            //whitelist:'gif|png|jpg|jpeg'
+            thumbnail: true, //| true | large
+            whitelist:'csv'
             //blacklist:'exe|php'
             //onchange:''
             //

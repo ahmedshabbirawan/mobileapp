@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\Definitions;
+use Carbon\Carbon;
 
 
 class Post extends Model{ //  implements Auditable{
@@ -57,11 +58,17 @@ class Post extends Model{ //  implements Auditable{
         return $this->hasMany(SubView::class);
     }
 
-
     public function getCreatedAtAttribute($value)
     {
-        return \Carbon\Carbon::parse($value)->format('d-m-Y H:i:s'); // Customize the format as needed
+        return Carbon::parse($value)->format('d-m-Y H:i:s');
     }
+
+    public static function getMediaIdByFileName($fileName)
+    {
+        return self::where('guid',$fileName)->first();
+    }
+
+
 
     
 
