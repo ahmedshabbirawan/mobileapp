@@ -41,6 +41,8 @@ class PostFromRequest extends FormRequest
 
         $rules['type'] = 'required';
 
+        /*
+
         if(!request()->get('id')){
             $rules['template_thumbnail_input'] = 'required';
         }
@@ -56,6 +58,8 @@ class PostFromRequest extends FormRequest
                 $index++;
             }
         }
+
+        */
         
 
 
