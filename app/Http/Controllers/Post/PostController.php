@@ -350,6 +350,11 @@ class PostController extends Controller
 
         if($request->ajax()){
             $file = $request->file('product_image');
+
+            if(!($file)){
+                return response()->json(['message' => 'File Not Found'], 422);
+            }
+
             $fileContents = file($file->getPathname());
             $action = $request->get('action');
             $templateArr = array();
@@ -361,10 +366,16 @@ class PostController extends Controller
                     continue;
                 }
                 $index++;
+                
+                
+                
                 $data = str_getcsv($line);
-
+                // if($index == 13){
+                //     dd($data);
+                // }
+                
                 $templateThumbnail = $data[4];
-                $subViewImageName = $data[11];
+                $subViewImageName = (isset($data[11]))?$data[11]:'';
                 
                 $thumbnailId = Post::getMediaIdByFileName($templateThumbnail);
                 $thumbnailId = ($thumbnailId)?$thumbnailId->id:'';
@@ -388,13 +399,13 @@ class PostController extends Controller
                     ];
                 }
                 $templateArr[$data[0]]['sub_views'][] = [
-                    'type' => $data[5],
-                    'frame' => $data[6],
-                    'text' => $data[7],
-                    'font_name' => $data[8],
-                    'font_size' => $data[9],
-                    'font_color' => $data[10],
-                    'image_name' => $data[11],
+                    'type' => (isset($data[5]))?$data[5]:'',
+                    'frame' => (isset($data[6]))?$data[6]:'',
+                    'text' => (isset($data[7]))?$data[7]:'',
+                    'font_name' => (isset($data[8]))?$data[8]:'',
+                    'font_size' => (isset($data[9]))?$data[9]:'',
+                    'font_color' => (isset($data[10]))?$data[10]:'',
+                    'image_name' => (isset($data[10]))?$data[10]:'',
                     'media_id' => $mediaId
                 ];
             }
@@ -428,7 +439,7 @@ class PostController extends Controller
                             'text' => $subView['text'],
                             'font_name' => $subView['font_name'],
                             'font_size' => $subView['font_size'],
-                            'font_color' => $subView['font_color'],
+                            'text_color' => $subView['font_color'],
                             'image_name' => $subView['image_name'],
                         ]); 
                     }
