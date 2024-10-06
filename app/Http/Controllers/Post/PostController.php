@@ -10,6 +10,7 @@ use App\Models\PostTerm;
 use App\Models\SubView;
 use App\Models\Term;
 use App\Util\Util;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -104,8 +105,8 @@ class PostController extends Controller
     }
 
     public function store(PostFromRequest $request){
-        $name           = $request->get('name');
-        $status         = $request->get('status','publish');
+        $title = $request->get('name');
+        $status = $request->get('status','publish');
 
         $subViewIds = $request->get('sub_view_id');
         $types = $request->get('type');
@@ -127,7 +128,8 @@ class PostController extends Controller
         
         
         $array = array(
-            'post_title' => $name,
+            'post_title' => $title,
+            'post_slug' => Str::slug($title),
             'post_content' => '',
             'post_author' => (auth()->user())? auth()->user()->id:0,
             'post_status' => $status,
@@ -189,7 +191,6 @@ class PostController extends Controller
             
             
         }catch(\Exception $e){
-            dd($e);
             DB::rollBack();
             return response()->json(['message' => $e->fileName() .' - '.$e->getLine() .' : Error : Please Contact Support'. $e->getMessage()], 500);
         }
@@ -223,7 +224,7 @@ class PostController extends Controller
 
     public function update(PostFromRequest $request, Post $product, $id){
         $product = Post::find($id);
-        $name           = $request->get('name');
+        $title = $request->get('name');
         $status         = $request->get('status');
         $postSubView    = SubView::where('post_id',$id)->pluck('id')->toArray();
 
@@ -247,7 +248,8 @@ class PostController extends Controller
         }
 
         $array = array(
-            'post_title' => $name,
+            'post_title' => $title,
+            'post_slug' => Str::slug($title),
             'post_content' => '',
             'post_author' => auth()->user()->id,
             'post_status' => $status,
@@ -365,9 +367,6 @@ class PostController extends Controller
                     $index++;
                     continue;
                 }
-                $index++;
-                
-                
                 
                 $data = str_getcsv($line);
                 // if($index == 13){
@@ -409,40 +408,68 @@ class PostController extends Controller
                     'media_id' => $mediaId
                 ];
             }
+
+
+
+
+
+
+
             if($action == 'insert'){
                 try{
                 foreach($templateArr as $template){
-                    $post = Post::create([
+
+                    $postTitle = $template['name'];
+                    $postSlug  = Str::slug($postTitle);
+
+                    $post = Post::where('post_slug',$postSlug)->first();
+
+                    $postDataArr = [
                         'post_type' => 'logo',
                         'post_title' => $template['name'],
-                        'post_content' => '',//json_encode($template),
+                        'post_slug' => $postSlug,
+                        'post_content' => '',
                         'post_author' => 1,
                         'template_bounds' => $template['bounds'],
                         'thumbnail_id' => $template['thumbnail_id']
+                    ];
 
-                    ]);
+                    if($post){
+                        ////////////    UPDATE POST /////////////
+                        $post->update($postDataArr);
+                    }else{
+                        ////////////    INSERT NEW POST /////////////
+                        $post = Post::create($postDataArr);
+                    }
 
                     $categories = explode(',',$template['categories']);
 
-                    foreach($categories as  $category){
-                        $categoryId = $this->getCategoryIdByName($category);
-                        PostTerm::create([
-                            'post_id' => $post->id,
-                            'term_id' => $categoryId
-                        ]);
-                    }
-                    foreach($template['sub_views'] as  $subView){
-                        SubView::create([
-                            'post_id' => $post->id,
-                            'type' => $subView['type'],
-                            'frame' => $subView['frame'],
-                            'text' => $subView['text'],
-                            'font_name' => $subView['font_name'],
-                            'font_size' => $subView['font_size'],
-                            'text_color' => $subView['font_color'],
-                            'image_name' => $subView['image_name'],
-                        ]); 
-                    }
+                        PostTerm::where('post_id',$post->id)->delete();
+                        SubView::where('post_id',$post->id)->delete();
+    
+                        foreach($categories as  $category){
+                            $categoryId = $this->getCategoryIdByName($category);
+                            PostTerm::create([
+                                'post_id' => $post->id,
+                                'term_id' => $categoryId
+                            ]);
+                        }
+                        foreach($template['sub_views'] as  $subView){
+                            SubView::create([
+                                'post_id' => $post->id,
+                                'type' => $subView['type'],
+                                'frame' => $subView['frame'],
+                                'text' => $subView['text'],
+                                'font_name' => $subView['font_name'],
+                                'font_size' => $subView['font_size'],
+                                'text_color' => $subView['font_color'],
+                                'image_name' => $subView['image_name'],
+                            ]); 
+                        }
+
+
+
+                    
                 }
             }catch(\Exception $e){
                 return response()->json(['message' => $e->getLine() .' : Error : Please Contact Support'. $e->getMessage()], 500);

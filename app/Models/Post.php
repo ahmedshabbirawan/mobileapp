@@ -78,7 +78,8 @@ class Post extends Model{ //  implements Auditable{
       //   self::curdBy();
     }
     protected function getStatusLabelAttribute($value){
-        return self::statusLabel($this->status);
+        return $this->post_status;
+        // return self::statusLabel($this->status);
     }
 
 
