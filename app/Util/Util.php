@@ -14,8 +14,18 @@ class Util extends Model{
     use HasFactory;	
 
 
+    // exists
+
+    static function isFileExists($fileName){
+        return Storage::disk('uploads')->exists('post/'.$fileName); 
+    }
+
+    static function getImagePath($fileName){
+        return Storage::disk('uploads')->path('post/'.$fileName); 
+    }
+
     static function imageUrl($fileName, $full=null){
-        return Storage::disk('public')->url('post_images/'.$fileName); 
+        return Storage::disk('uploads')->url('post/'.$fileName); 
     }
 
     static function fileUploadToMediaGallery($requestFile){ 
@@ -26,7 +36,7 @@ class Util extends Model{
             // $fileNameToStore = "logo-".'-'.time().'-'.rand(9001,9999).'.'.$extension;
             $fileNameToStore = $filename.'.'.$extension;
             $mimeType = $requestFile->getClientMimeType();
-            $path = $requestFile->storeAs('public/post_images', $fileNameToStore);
+            $path = $requestFile->storeAs('post', $fileNameToStore,'uploads');
             /*
             $imgFile = Image::fromFile($path);
             $imgFile->resize(150, 150, Image::EXACT );

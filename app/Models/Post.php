@@ -68,14 +68,8 @@ class Post extends Model{ //  implements Auditable{
         return self::where('guid',$fileName)->first();
     }
 
-
-
-    
-
-
     protected static function booted() {
         parent::boot();
-      //   self::curdBy();
     }
     protected function getStatusLabelAttribute($value){
         return $this->post_status;

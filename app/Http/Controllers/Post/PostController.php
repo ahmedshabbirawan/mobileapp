@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Storage;
 
 
 class PostController extends Controller
@@ -83,7 +83,7 @@ class PostController extends Controller
                      $action .= '<a href="'.route('post.logo.view', $row->id).'" class="btn btn-xs btn-success" data-toggle="tooltip" title="Detail" ><i class="ace-icon fa fa-eye bigger-120"></i></a>';
                      $action .= '<a href="'.route('post.logo.edit', $row->id).'" class="btn btn-xs btn-info"  data-toggle="tooltip" title="Edit" ><i class="ace-icon fa fa-pencil bigger-120"></i></a>';
                      $action .= '<a href="javascript:void(0);" onclick="changeStatus('.$row->id.');" class="btn btn-xs btn-warning" data-toggle="tooltip" title="Change Status" ><i class="ace-icon '.$statusIcon.' bigger-120"></i></a>';
-                    //  $action .= '<a href="javascript:void(0);" onclick="deleteConfirmation('.$row->id.');" class="btn btn-xs btn-danger" data-toggle="tooltip" title="Delete" ><i class="ace-icon fa fa-trash-o bigger-120"></i></a>';
+                     $action .= '<a href="javascript:void(0);" onclick="deleteConfirmation('.$row->id.');" class="btn btn-xs btn-danger" data-toggle="tooltip" title="Delete" ><i class="ace-icon fa fa-trash-o bigger-120"></i></a>';
                      $action .= '</div>';
                     return $action;
             })->rawColumns(['status_label','categories','action']);
@@ -327,8 +327,25 @@ class PostController extends Controller
 
  
     public function destroy($id,Post $post){
-        return ['Stop'];
-        Post::find($id)->delete();
+        // return Util::getImagePath('logo--1727788250-9656.png');
+        $post = Post::findOrFail($id);
+        $thumbnail = Post::find($post->thumbnail_id);
+        $subViews = SubView::where('post_id',$post->id)->get();
+
+        foreach($subViews as $view){
+            // $subView = Post::where('post_id', $view->post_id)->first();
+            if($view->image_name){
+                optional(Post::where('guid',$view->image_name)->first())->delete();
+                Storage::delete(Util::getImagePath($view->image_name));
+                $view->delete();
+            }
+        }
+        if($thumbnail){
+            Storage::delete(Util::getImagePath($thumbnail->guid));
+            $thumbnail->delete();
+        }
+        $post->delete();
+        return response()->json(['message' => 'Template Delete succussfully'], 200);
     }
 
 

@@ -13,7 +13,7 @@ Media Gallery
         <h1>Media Gallery</h1>
     </div>
     <div class="" style="float: right;">
-        <a href="{{ route('media.create') }}" class="btn btn-xs btn-light bigger"><i class="ace-icon fa fa-floppy-o"></i> Media Gallery </a> 
+        <a href="{{ route('media.create') }}" class="btn btn-xs btn-light bigger"><i class="ace-icon fa fa-floppy-o"></i> Upload Images </a> 
     </div>
 </div>
 
@@ -189,7 +189,7 @@ Media Gallery
                     title: 'Action'
                 }
             ],
-            // order: [[1, 'asc']]
+             order: [[1, 'desc']]
         });
     });
 </script>

@@ -71,6 +71,11 @@ Route::get('/clear', function () {
 });
 
 
+Route::get('/linkstorage', function () {
+    Artisan::call('storage:link');
+});
+
+
 Route::get('/', function () {
     return view('site.home');
 });

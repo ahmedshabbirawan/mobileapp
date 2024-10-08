@@ -1,13 +1,13 @@
 @extends('Layout.master')
 
 @section('title')
- Create Logo
+ Upload Images
 @endsection
 
 @section('content')
 
 <div class="page-content">
-<div class="page-header"><h1>Logos</h1></div>
+<div class="page-header"><h1>Upload Images</h1></div>
 
 @include('media.form')
 

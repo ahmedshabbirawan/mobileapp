@@ -63,6 +63,7 @@ Templates
 </div>
 
 <!--- delete confirmation modal --->
+<p id="delete-para" style="display: none;" ></p>
 <div class="modal" tabindex="-1" role="dialog" id="deletePopup">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -128,7 +129,9 @@ Templates
                     text: 'Yes',
                     action: function() {
                         var changeURL = "{{ route('post.logo.delete','') }}";
-                        window.location = changeURL + '/' + selectID;
+                       //  window.location = changeURL + '/' + selectID;
+                        $( "#delete-para" ).load( changeURL + '/' + selectID );
+                        table.ajax.reload();
                     }
                 },
                 no: {
@@ -223,7 +226,7 @@ Templates
                     title: 'Action'
                 }
             ],
-            // order: [[1, 'asc']]
+            order: [[0, 'desc']]
         });
 
 

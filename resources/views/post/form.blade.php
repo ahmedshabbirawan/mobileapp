@@ -363,6 +363,15 @@ if (isset($product)) {
     function checkValidation() {
 
 
+        // subview_image_file[]
+
+        // var dd = $("[name='subview_image_file[]']").val();
+        // $().each()
+        // console.log(dd);
+        // return true;
+
+
+
         // const formElement = document.querySelector("#product_form");
         let myform = document.getElementById("product_form");
         let fdata = new FormData(myform);
@@ -395,7 +404,7 @@ if (isset($product)) {
                                 yes: {
                                     text: 'OK',
                                     action: function() {
-                                        window.location = "{{ route('post.logo.create') }}";
+                                      //   window.location = "{{ route('post.logo.create') }}";
                                     }
                                 }
                             }

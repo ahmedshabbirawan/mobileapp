@@ -33,7 +33,7 @@ if (isset($product)) {
                                 <div class="widget-main">
                                     <p id="msg-div"></p>
                                     <div class="col-lg-4">
-                                        <label style="font-size:11px;">Product Image</label>
+                                        <label style="font-size:11px;">Image file(s)</label>
                                         <input type="file" name="post_files[]" multiple id="file_2" />
                                     </div>
                                     <div class="space-4"></div>
@@ -123,6 +123,7 @@ if (isset($product)) {
                     // console.log(textStatus,jqXHR, errorThrown);
                     if (jqXHR.status != 200) {
                         if (typeof jqXHR.responseJSON !== 'undefined') {
+                            $('#msg-div').html(jqXHR.responseJSON.message);
                             $.confirm({
                                 title: 'Error',
                                 content: jqXHR.responseJSON.message

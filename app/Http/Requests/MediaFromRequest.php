@@ -4,9 +4,10 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
+use App\Util\Util;
+use Closure;
 
 class MediaFromRequest extends FormRequest
 {
@@ -26,15 +27,25 @@ class MediaFromRequest extends FormRequest
                                                     'errors'=>$validator->errors()->all()], 422));
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
+
     public function rules(){
         $rules  = [];
-        $rules['post_title']      =  'required';
-        $rules['post_files']     =  'required';
+        $rules['post_files'] = ['required', function (string $attribute, mixed $value, Closure $fail) {
+            $subviewImageFileArr = request()->file('post_files');
+            $imageFound = [];
+            foreach($subviewImageFileArr as $file){
+                if($file){
+                    $fileNameWithExt = $file->getClientOriginalName();
+                    $fileExist = Util::isFileExists($fileNameWithExt);
+                    if($fileExist){
+                        $fail('Image ['.$fileNameWithExt.'] File already exists');
+                    }
+
+                }
+            }
+        },];
+
+
         return $rules;
     }
 }
