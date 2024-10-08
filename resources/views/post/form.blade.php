@@ -404,7 +404,7 @@ if (isset($product)) {
                                 yes: {
                                     text: 'OK',
                                     action: function() {
-                                      //   window.location = "{{ route('post.logo.create') }}";
+                                      window.location = "{{ route('post.logo.create') }}";
                                     }
                                 }
                             }

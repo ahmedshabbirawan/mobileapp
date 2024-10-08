@@ -38,7 +38,7 @@ return [
         'uploads' => [
             'driver' => 'local',
             'root' => storage_path('app/images'),
-            'url' => env('APP_URL').'/public/storage/images/',
+            'url' => env('APP_URL').'/storage/images/',
             'visibility' => 'public',
         ],
 
